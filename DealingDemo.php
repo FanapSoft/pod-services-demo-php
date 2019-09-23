@@ -1,4 +1,10 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: ReZa ZaRe <rz.zare@gmail.com>
+ * Date: 2019/08/03
+ * Time: 12:26 PM
+ */
 require __DIR__ . '/vendor/autoload.php';
 
 error_reporting(E_ALL);
@@ -7,11 +13,19 @@ ini_set("display_errors", 1);
 # ================================================ Dealing SERVICES ====================================================
 # required classes
 use Pod\Dealing\Service\DealingService;
+use Pod\Base\Service\Exception\ValidationException;
+use Pod\Base\Service\Exception\PodException;
+
 
 # set serverType to SandBox or Production
-$serverType = "Production";
+BaseInfo::initServerType(BaseInfo::PRODUCTION_SERVER);
+
+const API_TOKEN = '{PUT API TOKEN}';
+const ACCESS_TOKEN = '{PUT ACCESS TOKEN}'; # access token will be expired each 15 minutes refresh this token with SSOService->refreshAccessToken
+const TOKEN_ISSUER = 1;
+
 #  instantiates a DealingService
-$dealingService = new DealingService($serverType);
+$dealingService = new DealingService();
 
 # ================================================ add User And Business ===============================================
 function addUserAndBusiness()
@@ -21,8 +35,8 @@ function addUserAndBusiness()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"               => 'Api_Token',      # Api_Token
+            ## ============================ *Required Parameters  =========================
+            "apiToken"               => API_TOKEN,      # Api_Token
             "username"              => 'USER NAME',
             "businessName"          => 'BUSINESS NAME',
             "email"                 => 'EMAIL',
@@ -35,8 +49,8 @@ function addUserAndBusiness()
             "agentFirstName"        => 'AGENT FIRST NAME',
             "agentLastName"         => 'AGENT LAST NAME',
             "agentCellphoneNumber"  => 'AGENT PHONE NUMBER',
-        ## ========================================= Optional Parameters  ==============================================
-#             "_token_issuer_"       => 1,
+            ## =========================== Optional Parameters  ===========================
+#             "tokenIssuer"       => TOKEN_ISSUER,
 #             "firstName"            => 'FIRST NAME',
 #             "lastName"             => 'LAST NAME',
 #             "sheba"                => 'SHEBA WITHOUT IR',
@@ -62,11 +76,11 @@ function addUserAndBusiness()
     try {
         $result = $dealingService->addUserAndBusiness($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -78,10 +92,10 @@ function listUserCreatedBusiness()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"               => 'Api_Token',  # Api_Token
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"        => 1,
+            ## ============================ *Required Parameters  =========================
+            "apiToken"               => API_TOKEN,  # Api_Token
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"        => TOKEN_ISSUER
 #            "bizId"                 => 'BUSINESS ID',
 #            "username"              => 'USER NAME',
 #            "businessName"          => 'BUSINESS NAME',
@@ -99,18 +113,18 @@ function listUserCreatedBusiness()
 #            "nationalCode"          => 'CODE',
 #            "economicCode"          => 'CODE',
 #            "cellphone"             => '09120000000',
-#            "tags"                  => 'TAG1,TAG2',            # لیست تگ
-#            "tagTrees"              => 'TREE1,TREE2',              # لیست درخت تگ
+#            "tags"                  => ['TAG1', 'TAG2'],            # لیست تگ
+#            "tagTrees"              => ['TREE1', 'TREE2'],              # لیست درخت تگ
 
     ];
     try {
         $result = $dealingService->listUserCreatedBusiness($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -123,9 +137,9 @@ function updateBusiness()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"               => 'Api_Token',                 # Api_Token
-            "bizId"                 => 1111,                      # شناسه کسب و کار
+            ## ============================ *Required Parameters  =========================
+            "apiToken"               => API_TOKEN,                 # Api_Token
+            "bizId"                 => '{put business id}',                      # شناسه کسب و کار
             "businessName"          => 'BUSINESS NAME',             # نام کسب و کار
             "guildCode"             => ['GUILD_CODE'],              # لیست کد اصناف
             "country"               => 'COUNTRY',                            # کشور
@@ -133,8 +147,8 @@ function updateBusiness()
             "city"                  => 'CITY',                                # شهر
             "address"               => 'ADDRESS',                            # آدرس
             "description"           => 'DESCRIPTION',                     # توضیحات
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"         => 1,
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"         => TOKEN_ISSUER
 #            "email"                  => 'EMAIL',
 #            "companyName"            => 'COMPANY NAME',            # نام شرکت
 #            "shopName"               => 'SHOP NAME',               # نام فروشگاه
@@ -173,11 +187,11 @@ function updateBusiness()
     try {
         $result = $dealingService->updateBusiness($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -189,21 +203,21 @@ function getApiTokenForCreatedBusiness()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"               => 'Api_Token',  # Api_Token
-            'businessId'            => 1111,            # id of business
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"        => 1,
+            ## ============================ *Required Parameters  =========================
+            "apiToken"               => API_TOKEN,  # Api_Token
+            'businessId'            => '{put business id}',            # id of business
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"        => TOKEN_ISSUER
 
-        ];
+    ];
     try {
         $result = $dealingService->getApiTokenForCreatedBusiness($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -215,22 +229,22 @@ function rateBusiness()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"       => 'Access_Token',  # Access_Token
-            'businessId'    => 1111,            # id of business
-            'rate'          => 10,              # [user rate between 0 and 10]
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"        => 1,      # default is 1
+            ## ============================ *Required Parameters  =========================
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
+            'businessId'    => '{put business id}',            # id of business
+            'rate'          => '{put rate, between 0 and 10}',              # [user rate between 0 and 10]
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"        => TOKEN_ISSUER      # default is 1
 
-        ];
+    ];
     try {
         $result = $dealingService->rateBusiness($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -242,22 +256,22 @@ function commentBusiness()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"       => 'Access_Token',  # Access_Token
-            'businessId'    => 1111,            # id of business
+            ## ============================ *Required Parameters  =========================
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
+            'businessId'    => '{put business id}',            # id of business
             'text'          => "COMMENT",       # [user rate between 0 and 10]
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"        => 1,          # default is 1
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"        => TOKEN_ISSUER          # default is 1
 
-        ];
+    ];
     try {
         $result = $dealingService->commentBusiness($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -269,22 +283,22 @@ function businessFavorite()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"               => 'Access_Token',      # Access_Token
-            'businessId'            => 1111,                # id of business
+            ## ============================ *Required Parameters  =========================
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
+            'businessId'            => '{put business id}',                # id of business
             'disfavorite'           => "true/false",        # or true
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"        => 1,      # default is 1
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"        => TOKEN_ISSUER      # default is 1
 
-        ];
+    ];
     try {
         $result = $dealingService->businessFavorite($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -296,21 +310,21 @@ function userBusinessInfos()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"   => 'Access_Token | Api_Token',          # [ACCESS_TOKEN] یا [ACCESS_TOKEN]
+            ## ============================ *Required Parameters  =========================
+            "token"   => 'Access_Token | Api_Token',          # [ACCESS_TOKEN] یا [ACCESS_TOKEN]
             "id"        => ["id of business"],                  # id of business
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"        => 1,          # default is 1
+            ## =========================== Optional Parameters  ===========================
+#            "tokenIssuer"        => TOKEN_ISSUER          # default is 1
 
-        ];
+    ];
     try {
         $result = $dealingService->userBusinessInfos($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -322,12 +336,12 @@ function commentBusinessList()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"           => 'Access_Token | Api_Token',  # [API_TOKEN] یا [ACCESS_TOKEN]
+            ## ============================ *Required Parameters  =========================
+            "token"           => 'Access_Token | Api_Token',  # [API_TOKEN] یا [ACCESS_TOKEN]
             'businessId'        => "BUSINESS ID",               # id of business
-            'offset'            => 0,                           # [user rate between 0 and 10]
-        ## ========================================= Optional Parameters  ==============================================
-            # "_token_issuer_"   => 1,              # default is 1
+            'offset'            => '{put offset}',                           # [user rate between 0 and 10]
+            ## =========================== Optional Parameters  ===========================
+            # "tokenIssuer"   => TOKEN_ISSUER              # default is 1
             # "size": 10,
             # "firstId": ID,
             # "lastId" : ID,
@@ -337,11 +351,11 @@ function commentBusinessList()
     try {
         $result = $dealingService->commentBusinessList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -353,21 +367,20 @@ function confirmComment()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            "_token_"           => 'Api_Token',     # Api_Token
-            'commentId'         => 1111,            # id of comment
-        ## ========================================= Optional Parameters  ==============================================
-#            "_token_issuer_"    => 1,              # default is 1
+            ## ============================ *Required Parameters  =========================
+            "apiToken"           => API_TOKEN,     # Api_Token
+            'commentId'         => '{put comment id}',            # id of comment
+            ## =========================== Optional Parameters  ===========================
+#            "_token_issuer_"    => TOKEN_ISSUER              # default is 1
 
-        ];
+    ];
     try {
         $result = $dealingService->confirmComment($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
-

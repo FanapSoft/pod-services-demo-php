@@ -3,42 +3,29 @@ require __DIR__ . '/vendor/autoload.php';
 
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-
 # ================================================ Billing SERVICES ====================================================
-
 # required classes
 use Pod\Billing\Service\BillingService;
 use Pod\Base\Service\BaseInfo;
+use Pod\Base\Service\Exception\ValidationException;
+use Pod\Base\Service\Exception\PodException;
 
+const API_TOKEN = '{PUT API TOKEN}';
+const TOKEN_ISSUER = 1;
+
+# set serverType to SandBox or Production
+BaseInfo::initServerType(BaseInfo::PRODUCTION_SERVER);
 
 $baseInfo = new BaseInfo();
-# set serverType to SandBox or Production
-$baseInfo->setServerType("{Production | Sandbox}");
-$baseInfo->setToken("{put Api Token here}");
-$baseInfo->setTokenIssuer(1);
+$baseInfo->setToken(API_TOKEN);
+$baseInfo->setTokenIssuer(TOKEN_ISSUER);
+
 
 #  instantiates a BillingService
 $BillingService = new BillingService($baseInfo);
 
 # ================================================== Billing BUY =======================================================
 # ======================================================================================================================
-
-# ===================================================== get OTT ========================================================
-function getOtt($apiName = 'getOtt')
-{
-    echo "============================================= get OTT ==========================================" .PHP_EOL;
-    global $BillingService;
-    try {
-        $result = $BillingService->getOtt($apiName);
-        print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-    }
-}
 
 # ================================================= create Pre Invoice =================================================
 function createPreInvoice()
@@ -47,8 +34,8 @@ function createPreInvoice()
     global $BillingService;
 
     $param = [
-        ## =========================================== *Required Parameters ============================================
-        "ott"         => "{put ott here}", # private-call-address توکن یک بار مصرف دریافتی از سرور
+        ## ============================ *Required Parameters  =========================
+        "ott"         => "bbfdcf363bec5774", # private-call-address توکن یک بار مصرف دریافتی از سرور
         "productList"   => [
             [
                 # شناسه محصول . در صورتی که بند فاکتور محصول مرتبط ندارد مقدار آن 0 وارد شود
@@ -60,22 +47,12 @@ function createPreInvoice()
                 # توضیحات
                 "productDescription"=> "{put description}",
             ],
-            [
-                # شناسه محصول . در صورتی که بند فاکتور محصول مرتبط ندارد مقدار آن 0 وارد شود
-                "productId"         => "{put product id}",
-                # مبلغ بند فاکتور. برای استفاده از قیمت محصول وارد شده از مقدار auto استفاده نمایید
-                "price"             => "{put product price, type: decimal}",
-                #تعداد محصول
-                "quantity"          => "{put product price, type: integer}",
-                # توضیحات
-                "productDescription"=> "{put description}",
-            ],
+            //اطلاعات محصولات دیگر
         ],
         "guildCode"                 => "{put guild code}", # *			کد صنف فاکتور
         "redirectUri"               => "{put redirect uri}",
-        "userId"               => 1111,  # the id of customer
-        ## ======================================== Optional Parameters ================================================
-        # "userId" => "{put customer user id}"	, #	شناسه کاربر مربوط به مشتری
+        "userId"               => "{put customer user id}",  # the id of customer
+        ## =========================== Optional Parameters  ===========================
         # "billNumber"=> "{put bill numer}", #                              شماره قبض منحصر به فرد کسب و کار
         # "redirectUri" => "{put redrect uri}",
         #"callUrl"=>  "{put call uri}", #در صورت پرداخت موفق این آدرس صدا خواهد شد#
@@ -89,18 +66,16 @@ function createPreInvoice()
     try {
         $result = $BillingService->createPreInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 #  unComment next line to  create Pre Invoice
-    createPreInvoice();
-    die;
+//createPreInvoice();
+//die;
 
 # ================================================== issue Invoice =====================================================
 function issueInvoice()
@@ -109,7 +84,7 @@ function issueInvoice()
     global $BillingService;
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
+            ## ============================ *Required Parameters  =========================
             "productList"   	=> [
                 [
                     # شناسه محصول . در صورتی که بند فاکتور محصول مرتبط ندارد مقدار آن 0 وارد شود
@@ -121,25 +96,15 @@ function issueInvoice()
                     # توضیحات
                     "productDescription"=> "{put description}",
                 ],
-                [
-                    # شناسه محصول . در صورتی که بند فاکتور محصول مرتبط ندارد مقدار آن 0 وارد شود
-                    "productId"         => "{put product id}",
-                    # مبلغ بند فاکتور. برای استفاده از قیمت محصول وارد شده از مقدار auto استفاده نمایید
-                    "price"             => "{put product price, type: decimal}",
-                    #تعداد محصول
-                    "quantity"          => "{put product price, type: integer}",
-                    # توضیحات
-                    "productDescription"=> "{put description}",
-                ],
+                // اطلاعات محصولات دیگر
             ],
             # کد صنف فاکتور
-            "guildCode"			=> "put guild code", # *Required
-
-            ## ========================================= Optional Parameters ===========================================
+            "guildCode"			=> "{put guild code}", # *Required
             # توکن یک بار مصرف اگر وارد نشود در متد issueInvoice از api دریافت می شود
             "ott" 				=> "{put ott}",
+            ## =========================== Optional Parameters  ===========================
             # آدرس فراخوانی صادر کننده فاکتور
-            "redirectURL" 		=> "p{ut redirect uri}",
+            "redirectURL" 		=> "{put redirect uri}",
             # شناسه کاربر مربوط به مشتری برای بدست آورن این شناسه می توانید پروفایل کاربر را دریافت نمایید.
             "userId" 			=> "{put user id}",
             # شماره قبض
@@ -156,7 +121,7 @@ function issueInvoice()
             "voucherHash" 		=> [],
             # نرخ مالیات برای این خرید که برای تمام آیتم های فاکتور اعمال می شود.
             #اگر مقداری ارسال نشود مقدار مالیات بر ارزش افزوده پیش فرض محاسبه می شود
-            "preferredTaxRate" 	=> 0.09,
+            "preferredTaxRate" 	=> "{put tax, default 0.09}",
             # پرداخت دومرحله ای true/false
             "verificationNeeded"=> "{true/false}",
             # تایید خودکار فاکتور در پرداخت دومرحله ای true/false
@@ -176,7 +141,7 @@ function issueInvoice()
             # توضیحات رویداد
             "eventDescription"	=> "{put event description}",
             # متادیتا برای فاکتور
-            "metadata"			=> 'put json format like {"name":"test"}',
+            "metadata"			=> '{put json format like {"name":"test"}}',
             #  اطلاعات جانبی رویداد format = json
             # example 1 : {bussinessName=’test’, bussinessURL=’www.test.com’, bussinessIcon=’null’,
             # actionList=[{command=’GET https://www.googleapis.com/calendar/v3/calendars/calendarId/events?privateExtendedProperty=petsAllowed%3Dyes
@@ -191,13 +156,11 @@ function issueInvoice()
     try {
         $result = $BillingService->issueInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -212,20 +175,18 @@ function verifyInvoice()
 
     $param =
         [
-            ## ========================================  Optional Parameters  ==========================================
+            ## =========================== Optional Parameters  ===========================
             "id" => "{invoice id}",
             "billNumber" => "billNumber",
         ];
     try {
         $result = $BillingService->verifyInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 //    verifyInvoice();
@@ -239,9 +200,9 @@ function payInvoice()
 
     $param =
         [
-            ## ======================================== *Required Parameters ===========================================
-            "invoiceId"     => 11111,             # شناسه فاکتور
-            ## ========================================  Optional Parameters ===========================================
+            ## ============================ *Required Parameters  =========================
+            "invoiceId"     => "{put invoice id}",             # شناسه فاکتور
+            ## =========================== Optional Parameters  ===========================
             "redirectUri"   => "{put redirect uri}",
             "callUri"       => "{put call uri}",
         ];
@@ -250,18 +211,16 @@ function payInvoice()
     try {
         $result = $BillingService->payInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 //
-//    payInvoice();
-//    die;
+//payInvoice();
+//die;
 #
 
 # ========================================== get Pay Invoice By Wallet Link ============================================
@@ -271,15 +230,21 @@ function getPayInvoiceByWalletLink()
     global $BillingService;
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "invoiceId"     => 22222,            # شناسه فاکتور
+            ## ============================ *Required Parameters  =========================
+            "invoiceId"     => "{put invoice id}",            # شناسه فاکتور
             ## =========================================  Optional Parameters ==========================================
             "redirectUri"   => "{put redirect uri}",
             "callUri"       => "{put call uri}",          # The function that will be called at the end of payment
         ];
 
-
-    echo ($BillingService->getPayInvoiceByWalletLink($param)).PHP_EOL;
+    try {
+        echo ($BillingService->getPayInvoiceByWalletLink($param)) . PHP_EOL;
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
 
 }
 
@@ -294,15 +259,22 @@ function getPayInvoiceByUniqueNumberLink()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "uniqueNumber"  => "put unique number of invoice",
+            ## ============================ *Required Parameters  =========================
+            "uniqueNumber"  => "{put unique number of invoice}",
             ## =========================================  Optional Parameters ==========================================
-            "redirectUri"   => "put redirect uri",
-            "callUri"       => "put call uri",          # The function that will be called at the end of payment
+            "redirectUri"   => "{put redirect uri}",
+            "callUri"       => "{put call uri}",          # The function that will be called at the end of payment
             "gateway"       => "PEP",
         ];
 
-    echo ($BillingService->getPayInvoiceByUniqueNumberLink($param)).PHP_EOL;
+    try{
+        echo ($BillingService->getPayInvoiceByUniqueNumberLink($param)).PHP_EOL;
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
 
 }
 
@@ -317,19 +289,17 @@ function closeInvoice()
 
     $param =
         [
-            ## ========================================= *Required Parameters ===========================================
-            "id" => 33333, # شناسه فاکتور
+            ## ============================ *Required Parameters  =========================
+            "id" => "{put invoice id}", # شناسه فاکتور
         ];
     try {
         $result = $BillingService->closeInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -347,11 +317,13 @@ function getInvoiceList()
 
     $param =
         [
-            ## ======================================== *Required Parameters ===========================================
+            ## ============================ *Required Parameters one of  =========================
+            "offset" => "{put offset}", # در صورتی که این فیلد وارد شود فیلدهای lastId و firstId نباید وارد شوند و نتیجه نزولی مرتب می شود
+            "firstId" => "put first id", # در صورتی که این فیلد وارد شود فیلدهای lastId و offset نباید وارد شوند و نتیجه صعودی مرتب می شود.
+            "lastId" => "put last id", # در صورتی که این فیلد وارد شود فیلدهای firstId و offset نباید وارد شوند و نتیجه نزولی مرتب می شود.
+            ## =========================== Optional Parameters  ===========================
+            "size" => "{put size}",
             "guildCode" => "put guild code", # کد صنف
-            "offset" => 0, # در صورتی که این فیلد وارد شود فیلدهای lastId و firstId نباید وارد شوند و نتیجه نزولی مرتب می شود
-            "size" => 10,
-            ## ========================================  Optional Parameters ===========================================
             "id" => "put invoice id",   # invoice id
             "billNumber" => "put bill number", # شماره قبض که به تنهایی با آن می توان جستجو نمود
             "uniqueNumber" => "put unique number", # شماره کد شده ی قبض که به تنهایی با آن می توان جستجو نمود
@@ -366,21 +338,17 @@ function getInvoiceList()
             "userId" => "put user id",                                        # شناسه کاربری مشتری
             "issuerId" => "put issuer id",                        # شناسه کاربری صادر کننده فاکتور
             "query" => "put search query",                                      # عبارت برای جستجو
-            "firstId" => "put first id", # در صورتی که این فیلد وارد شود فیلدهای lastId و offset نباید وارد شوند و نتیجه صعودی مرتب می شود.
-            "lastId" => "put last id", # در صورتی که این فیلد وارد شود فیلدهای firstId و offset نباید وارد شوند و نتیجه نزولی مرتب می شود.
             "productIdList" => [],  # لیست شماره محصولات
-    ];
+        ];
 
     try {
         $result = $BillingService->getInvoiceList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 //    getInvoiceList();
@@ -394,25 +362,22 @@ function getInvoiceListByMetadata() {
 
     $param =
         [
-            ## ========================================= Optional Parameters  ==========================================
-//              "metaQuery" =>  '{"name":"elham"}',
-                "metaQuery" =>  ["key"=>"value"],
-                "offset" => 0,
-                "size" => 10,
-                "isPayed" => "true/false",      # true/false
-                "isCanceled" => "true/false",   # true/false
-    ];
+            ## =========================== Optional Parameters  ===========================
+            "metaQuery" =>  ["key"=>"value"],
+            "offset" => "{put offset}",
+            "size" => "{put size}",
+            "isPayed" => "true/false",      # true/false
+            "isCanceled" => "true/false",   # true/false
+        ];
 
     try {
         $result = $BillingService->getInvoiceListByMetadata($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -427,35 +392,34 @@ function reduceInvoice()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "id" => 11111, # شناسه فاکتور
+            ## ============================ *Required Parameters  =========================
+            "id" => "{put invoice id}", # شناسه فاکتور
             "invoiceItemList" => [
                 [
-                    "invoiceItemId" => 22222,    # شناسه بند فاکتور
-                    "price" => 10, # مبلغ بند فاکتور
-                    "quantity" => 1,  # لیست تعداد محصول در هر بند فاکتور
+                    "invoiceItemId" => "{put invoice id of item 1}",    # شناسه بند فاکتور
+                    "price" => "{put price of item 1}", # مبلغ بند فاکتور
+                    "quantity" => "{put quantity of item 1}",  # لیست تعداد محصول در هر بند فاکتور
                     "itemDescription" => "reduce invoice", # لیست توضیحات بند فاکتور
                 ],
                 [
-                    "invoiceItemId" => 33333,    # شناسه بند فاکتور
-                    "price" => 100, # مبلغ بند فاکتور
-                    "quantity" => 1,  # لیست تعداد محصول در هر بند فاکتور
+                    "invoiceItemId" => "{put invoice id of item 2}",    # شناسه بند فاکتور
+                    "price" => "{put price of item 2}", # مبلغ بند فاکتور
+                    "quantity" => "{put quantity of item 2}",  # لیست تعداد محصول در هر بند فاکتور
                     "itemDescription" => "reduce invoice", # لیست توضیحات بند فاکتور
-                ]
+                ],
             ],
 
-            ## ========================================= Optional Parameters  ==========================================
-            "preferredTaxRate" => 0.09, # نرخ مالیات برای این خرید که برای تمام آیتم های فاکتور اعمال می شود. اگر مقداری ارسال نشود مقدار مالیات بر ارزش افزوده پیش فرض محاسبه می شود
+            ## =========================== Optional Parameters  ===========================
+            "preferredTaxRate" => "{put tax, default 0.09}", # نرخ مالیات برای این خرید که برای تمام آیتم های فاکتور اعمال می شود. اگر مقداری ارسال نشود مقدار مالیات بر ارزش افزوده پیش فرض محاسبه می شود
         ];
     try {
         $result = $BillingService->reduceInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -470,19 +434,17 @@ function cancelInvoice()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "id" => 11111, # شناسه فاکتور
+            ## ============================ *Required Parameters  =========================
+            "id" => "{put invoice id}", # شناسه فاکتور
         ];
     try {
         $result = $BillingService->cancelInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -497,20 +459,18 @@ function verifyAndCloseInvoice()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "id" => 11111 # شناسه فاکتور
-            ## ========================================= Optional Parameters  ==========================================
+            ## ============================ *Required Parameters  =========================
+            "id" => "{put invoice id}" # شناسه فاکتور
+            ## =========================== Optional Parameters  ===========================
         ];
     try {
         $result = $BillingService->verifyAndCloseInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -525,11 +485,11 @@ function getInvoiceListAsFile() {
 
     $param =
         [
-            ## ======================================== *Required Parameters ========================================
-            "guildCode" => "put guild code", # کد صنف
-            "lastNRows" => 10, # n ردیف آخر فاکتور
-            ## ========================================  Optional Parameters ========================================
-            "id" => "invoice id",
+            ## ============================ *Required Parameters  =========================
+            "guildCode" => "{put guild code}", # کد صنف
+            "lastNRows" => "{put last n rows}", # n ردیف آخر فاکتور
+            ## =========================== Optional Parameters  ===========================
+            "id" => "{put invoice id}",
             "billNumber" => "{put bill number}", # شماره قبض که به تنهایی با آن می توان جستجو نمود
             "uniqueNumber" => "{put unique number}", # شماره کد شده ی قبض که به تنهایی با آن می توان جستجو نمود
             "trackerId" => "{put tracker id}",
@@ -544,17 +504,15 @@ function getInvoiceListAsFile() {
             "query" => "{put query}",                               # عبارت برای جستجو
             "productIdList" => [],  # لیست شماره محصولات
             "callbackUrl" => "{put call back url}",    # آدرس فراخوانی پس از اتمام تولید گزارش
-    ];
+        ];
     try {
         $result = $BillingService->getInvoiceListAsFile($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -568,24 +526,22 @@ function getExportList()
     global $BillingService;
     $param =
         [
-            ## ======================================== *Required Parameters ===========================================
-            "offset" => 0,
-            "size" => 10,   # اندازه خروجی
-            "id" => 1494,  # شناسه درخواست
-            ## ========================================  Optional Parameters ===========================================
-            "statusCode" => "put status code", # کد وضعیت
-            "serviceUrl" => "put server url",           # آدرس سرویس
+            ## ============================ *Required Parameters  =========================
+            "offset" => "{put offset}",
+            "size" => "{put size}",   # اندازه خروجی
+            "id" => "{put request id}",  # شناسه درخواست
+            ## =========================== Optional Parameters  ===========================
+            "statusCode" => "{put status code}", # کد وضعیت
+            "serviceUrl" => "{put server url}",           # آدرس سرویس
         ];
     try {
         $result = $BillingService->getExportList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -603,23 +559,21 @@ function getInvoicePaymentLink()
 
     $param =
         [
-            ## ======================================== *Required Parameters ===========================================
-            "invoiceId"     => 11111,                       # شناسه فاکتور
+            ## ============================ *Required Parameters  =========================
+            "invoiceId"     => "{put invoice id}",                       # شناسه فاکتور
             ## =========================================  Optional Parameters ==========================================
-            "redirectUri"   => "put redirect uri",
-            "callbackUri"   => "put callback uri",      # The function that will be called at the end of payment
+            "redirectUri"   => "{put redirect uri}",
+            "callbackUri"   => "{put callback uri}",      # The function that will be called at the end of payment
             "gateway"       => "PEP",
         ];
     try {
         $result = $BillingService->getInvoicePaymentLink($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -633,9 +587,9 @@ function sendInvoicePaymentSMS() {
     global $BillingService;
     $param =
         [
-            ## ============================== *Required Parameters =============================
-            "invoiceId"          => 1111 , # شناسه فاکتور
-            ## ============================== Optional Parameters  ==============================
+            ## ============================ *Required Parameters  =========================
+            "invoiceId"          => "{put invoice id}" , # شناسه فاکتور
+            ## =========================== Optional Parameters  ===========================
             "wallet"             => "{put wallet code}",          # کد کیف پول PODLAND_WALLET
             "callbackUri"        => "{put call back uri}",         # آدرس جهت فراخوانی پس از پرداخت
             "redirectUri"        => "{put redirect uri}",          # آدرس جهت انتقال کاربر پس از پرداخت
@@ -645,11 +599,11 @@ function sendInvoicePaymentSMS() {
     try {
         $result = $BillingService->sendInvoicePaymentSMS($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 //    sendInvoicePaymentSMS();
@@ -664,21 +618,19 @@ function payInvoiceByInvoice()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
+            ## ============================ *Required Parameters  =========================
             "creditorInvoiceId" => "", # شناسه فاکتور بستانکار
             "debtorInvoiceId" => "", # شناسه فاکتور بدهکار
-            ## ========================================= Optional Parameters  ==========================================
+            ## =========================== Optional Parameters  ===========================
         ];
     try {
         $result = $BillingService->payInvoiceByInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -694,11 +646,11 @@ function payInvoiceInFuture()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
+            ## ============================ *Required Parameters  =========================
             "_ott_" => "" , # one time token - این توکن را در سرویس قبلی دریافت کرده اید.
-            "invoiceId" => 11111,                     # شناسه فاکتور
+            "invoiceId" => "{put invoice id}",                     # شناسه فاکتور
             "date" => "yyyy/mm/dd",# تاریخ شمسی سررسید
-            ## ========================================= Optional Parameters  ==========================================
+            ## =========================== Optional Parameters  ===========================
             # یکی و فقط یکی از فیلدهای زیر را باید پر کنید
             "guildCode" => "put guild code", # کد صنف
             "wallet" => "PODLAND_WALLET",  # کد کیف پول
@@ -706,13 +658,11 @@ function payInvoiceInFuture()
     try {
         $result = $BillingService->payInvoiceInFuture($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -727,10 +677,10 @@ function requestWalletSettlement()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
+            ## ============================ *Required Parameters  =========================
             "_ott_"         => "{Put ott here}" , # one time token - این توکن را در سرویس قبلی دریافت کرده اید.برای دریافت مجدد می توانید سرویس /nzh/ott/ را صدا کنید
-            "amount"        => 10000, # مبلغ برداشت
-            ## ========================================= Optional Parameters  ==========================================
+            "amount"        => "{put amount}", # مبلغ برداشت
+            ## =========================== Optional Parameters  ===========================
             "wallet"        => "{put wallet code}",          # کد کیف پول PODLAND_WALLET
             "firstName"     => "{put first name}",  # نام صاحب حسابی که تسویه به آن واریز می گردد
             "lastName"      => "{put last name}",  # نام خانوادگی صاحب حسابی که تسویه به آن واریز می گردد
@@ -742,13 +692,11 @@ function requestWalletSettlement()
     try {
         $result = $BillingService->requestWalletSettlement($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -763,29 +711,27 @@ function requestGuildSettlement()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "_ott_"         => "put ott" , # one time token - این توکن را در سرویس قبلی دریافت کرده اید.برای دریافت مجدد می توانید سرویس /nzh/ott/ را صدا کنید
-            "amount"        => 1000,                      # مبلغ برداشت
-            "guildCode"     => "put guild code",                # کد صنف
-            ## ========================================= Optional Parameters  ==========================================
-            "wallet"        => "put wallet code",           # کد کیف پول
-            "firstName"     => "put first name",  # نام صاحب حسابی که تسویه به آن واریز می گردد
-            "lastName"      => "put last name",  # نام خانوادگی صاحب حسابی که تسویه به آن واریز می گردد
-            "sheba"         => "put sheba",  # شماره شبا حسابی که تسویه به آن واریز می گردد
-            "currencyCode"  => "put currency code",  # کد ارز پیش فرض IRR
-            "uniqueId"      => "put unique id",             # شناسه یکتا
-            "description"   => "put description",           # شرح دلخواه
+            ## ============================ *Required Parameters  =========================
+            "_ott_"         => "{put ott}" , # one time token - این توکن را در سرویس قبلی دریافت کرده اید.برای دریافت مجدد می توانید سرویس /nzh/ott/ را صدا کنید
+            "amount"        => "{put amount}",                      # مبلغ برداشت
+            "guildCode"     => "{put guild code}",                # کد صنف
+            ## =========================== Optional Parameters  ===========================
+            "wallet"        => "{put wallet code}",           # کد کیف پول
+            "firstName"     => "{put first name}",  # نام صاحب حسابی که تسویه به آن واریز می گردد
+            "lastName"      => "{put last name}",  # نام خانوادگی صاحب حسابی که تسویه به آن واریز می گردد
+            "sheba"         => "{put sheba}",  # شماره شبا حسابی که تسویه به آن واریز می گردد
+            "currencyCode"  => "{put currency code}",  # کد ارز پیش فرض IRR
+            "uniqueId"      => "{put unique id}",             # شناسه یکتا
+            "description"   => "{put description}",           # شرح دلخواه
         ];
     try {
         $result = $BillingService->requestGuildSettlement($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -800,30 +746,28 @@ function requestSettlementByTool()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "_ott_"         => "put ott" , # one time token - این توکن را در سرویس قبلی دریافت کرده اید.برای دریافت مجدد می توانید سرویس /nzh/ott/ را صدا کنید
-            "amount"        => 10000,                       # مبلغ برداشت
-            "guildCode"     => "put guild code",                    # کد صنف
-            "toolId"        => "put tool id",           # شماره ابزاری که تسویه به آن واریز می گردد
-            "toolCode"      => "put tool code",# نوع ابزار برای تسویه کارت به کارت،پایا،ساتنا
+            ## ============================ *Required Parameters  =========================
+            "_ott_"         => "{put ott}" , # one time token - این توکن را در سرویس قبلی دریافت کرده اید.برای دریافت مجدد می توانید سرویس /nzh/ott/ را صدا کنید
+            "amount"        => "{put amount}",                       # مبلغ برداشت
+            "guildCode"     => "{put guild code}",                    # کد صنف
+            "toolId"        => "{put tool id}",           # شماره ابزاری که تسویه به آن واریز می گردد
+            "toolCode"      => "{put tool code}",# نوع ابزار برای تسویه کارت به کارت،پایا،ساتنا
             # [SETTLEMENT_TOOL_SATNA | SETTLEMENT_TOOL_PAYA | SETTLEMENT_TOOL_CARD]
-            ## ========================================= Optional Parameters  ==========================================
-            "firstName"     => "put first name",  # نام صاحب حسابی که تسویه به آن واریز می گردد
-            "lastName"      => "put last name",  # نام خانوادگی صاحب حسابی که تسویه به آن واریز می گردد
-            "currencyCode"  => "put currency code",       # کد ارز پیش فرض IRR
-            "uniqueId"      => "put unique id",          # شناسه یکتا
-            "description"   => "put description",          # شرح دلخواه
+            ## =========================== Optional Parameters  ===========================
+            "firstName"     => "{put first name}",  # نام صاحب حسابی که تسویه به آن واریز می گردد
+            "lastName"      => "{put last name}",  # نام خانوادگی صاحب حسابی که تسویه به آن واریز می گردد
+            "currencyCode"  => "{put currency code}",       # کد ارز پیش فرض IRR
+            "uniqueId"      => "{put unique id}",          # شناسه یکتا
+            "description"   => "{put description}",          # شرح دلخواه
         ];
     try {
         $result = $BillingService->requestSettlementByTool($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -838,10 +782,10 @@ function listSettlements()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "offset"        => 0,      # مبلغ برداشت
-            "size"          => 10,        # اندازه خروجی
-            ## ========================================= Optional Parameters  ==========================================
+            ## ============================ *Required Parameters  =========================
+            "offset"        => "{put offset}",      # مبلغ برداشت
+            "size"          => "{put size}",        # اندازه خروجی
+            ## =========================== Optional Parameters  ===========================
             "statusCode"    => "",  # کد وضعیت درخواست SETTLEMENT_REQUESTED، SETTLEMENT_SENT ، SETTLEMENT_DONE
             "currencyCode"  => "",  # کد ارز پیش فرض IRR
             "fromAmount"    => "",  # حد پایین مبلغ درخواست شده
@@ -853,13 +797,11 @@ function listSettlements()
     try {
         $result = $BillingService->listSettlements($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -874,9 +816,9 @@ function addAutoSettlement()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "guildCode"     => "put guild code",              # کد صنف
-            ## ========================================= Optional Parameters  ==========================================
+            ## ============================ *Required Parameters  =========================
+            "guildCode"     => "{put guild code}",              # کد صنف
+            ## =========================== Optional Parameters  ===========================
             "firstName"     => "",  # نام صاحب حسابی که تسویه به آن واریز می گردد
             "lastName"      => "",  # نام خانوادگی صاحب حسابی که تسویه به آن واریز می گردد
             "currencyCode"  => "",  # کد ارز پیش فرض IRR
@@ -886,13 +828,11 @@ function addAutoSettlement()
     try {
         $result = $BillingService->addAutoSettlement($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 //
@@ -907,21 +847,19 @@ function removeAutoSettlement()
 
     $param =
         [
-            ## ========================================= *Required Parameters ==========================================
-            "guildCode"     => "put guild code",              # کد صنف
-            ## ========================================= Optional Parameters  ==========================================
-            "currencyCode"  => "like USD or IRR",  # کد ارز پیش فرض IRR
+            ## ============================ *Required Parameters  =========================
+            "guildCode"     => "{put guild code}",              # کد صنف
+            ## =========================== Optional Parameters  ===========================
+            "currencyCode"  => "{like USD or IRR}",  # کد ارز پیش فرض IRR
         ];
     try {
         $result = $BillingService->removeAutoSettlement($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -936,21 +874,19 @@ function addDealer()
 
     $param =
         [
-        ## ========================================== *Required Parameters =============================================
-            "dealerBizId"     => 1111,              # شناسه کسب و کار واسط
-        ## ========================================== Optional Parameters  =============================================
+            ## ============================ *Required Parameters  =========================
+            "dealerBizId"     => "{put dealer business id}",              # شناسه کسب و کار واسط
+            ## =========================== Optional Parameters  ===========================
             "allProductAllow"  => true,             # دسترسی به همه محصولات
         ];
     try {
         $result = $BillingService->addDealer($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -965,22 +901,20 @@ function dealerList()
 
     $param =
         [
-        ## ========================================== Optional Parameters  =============================================
-            'dealerBizId'   => 1111,            # The id of business to be a dealer
+            ## =========================== Optional Parameters  ===========================
+            'dealerBizId'   => "{put dealer business id}",            # The id of business to be a dealer
             'enable'        => true,            # [true/false]
-            'size'          => 10,              # pagination size, default: 50
-            'offset'        => 0,               # pagination offset, default: 0
+            'size'          => "{put size}",              # pagination size, default: 50
+            'offset'        => "{put offset}",               # pagination offset, default: 0
         ];
     try {
         $result = $BillingService->dealerList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -995,19 +929,17 @@ function enableDealer()
 
     $param =
         [
-        ## ========================================= *Required Parameters ==============================================
-            "dealerBizId"     => 1111,  # The id of dealer business *that is a number*
+            ## ============================ *Required Parameters  =========================
+            "dealerBizId"     => "{put dealer business id}",  # The id of dealer business *that is a number*
         ];
     try {
         $result = $BillingService->enableDealer($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1022,19 +954,17 @@ function disableDealer()
 
     $param =
         [
-        ## ========================================= *Required Parameters ==========================================
-            "dealerBizId"     => 1111,  # The id of dealer business that is a number
+            ## ============================ *Required Parameters  =========================
+            "dealerBizId"     => "{put business id}",  # The id of dealer business that is a number
         ];
     try {
         $result = $BillingService->disableDealer($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-
-        print_r(
-            $e->GetResult()
-        );
-
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1049,20 +979,20 @@ function businessDealingList()
 
     $param =
         [
-        ## ========================================= Optional Parameters  ==============================================
-            'dealingBusinessId' => 1111,            # The id of dealing business
+            ## =========================== Optional Parameters  ===============================
+            'dealingBusinessId' => "{put dealer business id}",            # The id of dealing business
             'enable'            => true,            # [true/false]
-            'size'              => 10,              # pagination size, default: 50
-            'offset'            => 0,               # pagination offset, default: 0
+            'size'              => "{put size}",              # pagination size, default: 50
+            'offset'            => "{put offset}",               # pagination offset, default: 0
         ];
     try {
         $result = $BillingService->businessDealingList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1077,7 +1007,7 @@ function issueMultiInvoice()
     # ***** NOTE : the share of dealer + the share of shareholder = the price to be payed by customer  **** #
     $param =
         [
-        ## ========================================= *Required Parameters ==============================================
+            ## ============================ *Required Parameters  =========================
             "_ott_" => "put ott" ,                      # one time token - این توکن را در سرویس قبلی دریافت کرده اید.
             # آرایه حاوی اطلاعات فاکتورها
             "data" =>                       ## commented rows are optional parameters ##
@@ -1086,7 +1016,7 @@ function issueMultiInvoice()
                     // 'userId' => 11111,               # userId of customer
                     // 'currencyCode' => 'like EUR or IRR',
                     // 'voucherHashs' => [],            # array of vouchers  اگر وجود ندارد این پارامتر ارسال نشود
-                    // 'preferredTaxRate' => 0.09 ,     # tax to be added between 0 and 1 default is 0.09
+                    // 'preferredTaxRate' => "{put tax, default 0.09}" ,     # tax to be added between 0 and 1 default is 0.09
                     // 'verificationNeeded' => 'true/false',
                     // 'preview' => '',
                     'mainInvoice'=>
@@ -1098,9 +1028,9 @@ function issueMultiInvoice()
                             'invoiceItemVOs' =>
                                 [
                                     [
-                                        'productId' => 0,   # the id of product or 0 if no product
-                                        'price' => 100,     # the share of dealer
-                                        'quantity' => 1,    # count
+                                        'productId' => "{put product id or 0}",   # the id of product or 0 if no product
+                                        'price' => "{put price}",     # the share of dealer
+                                        'quantity' => "{put quantity}",    # count
                                         'description' => 'put description'
                                     ],
                                 ],
@@ -1108,7 +1038,7 @@ function issueMultiInvoice()
                     'subInvoices' =>
                         [
                             [
-                                'businessId' => 111,       # the id of shareholder business
+                                'businessId' => "{put business id}",       # the id of shareholder business
                                 'guildCode' => 'put guild code',
                                 // 'billNumber' => 'put bill number',       # business unique bill number
                                 // 'metadata' => 'extra data in form of json',
@@ -1116,9 +1046,9 @@ function issueMultiInvoice()
                                 'invoiceItemVOs' =>
                                     [
                                         [
-                                            'productId' => 0,
-                                            'price' => 100,         # the share of shareholder
-                                            'quantity' => 10,
+                                            'productId' => "{put product id or 0}",
+                                            'price' => "{put price}",         # the share of shareholder
+                                            'quantity' => "{put quantity}",
                                             'description' => 'put description'
                                         ],
                                     ],
@@ -1129,15 +1059,15 @@ function issueMultiInvoice()
                     'customerInvoiceItemVOs' =>
                         [
                             [
-                                'productId' => 0,       # the id of product or 0 if no product,
-                                'price' => 100,         # the price to be payed by customer
-                                'quantity' => 11,       # count
+                                'productId' => "{put product id or 0}",       # the id of product or 0 if no product,
+                                'price' => "{put price}",         # the price to be payed by customer
+                                'quantity' => "{put quantity}",       # count
                                 'description' => 'put description'
                             ]
                         ]
                 ],
 
-        ## ========================================= Optional Parameters  ==============================================
+            ## =========================== Optional Parameters  ===============================
             'delegatorId'       => [],            # شناسه تفویض کنندگان، ترتیب اولویت را مشخص می کند
             'delegationHash'    => [],            # کد تفویض برای اشاره به یک تفویض مشخص
             'forceDelegation'   => false,              # پرداخت فقط از طریق تفویض
@@ -1145,11 +1075,11 @@ function issueMultiInvoice()
     try {
         $result = $BillingService->issueMultiInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1163,20 +1093,20 @@ function reduceMultiInvoice()
     global $BillingService;
     $param =
         [
-        ## ========================================= *Required Parameters ==============================================
-        # ***** NOTE : the share of dealer + the share of shareholder = the price to be payed by customer  **** #
+            ## ============================ *Required Parameters  =========================
+            # ***** NOTE : the share of dealer + the share of shareholder = the price to be payed by customer  **** #
             'data' =>
                 [
-                    'preferredTaxRate' => 0.09,            # tax to be added between 0 and 1 default is 0.09
+                    'preferredTaxRate' => "{put tax, default 0.09}",            # tax to be added between 0 and 1 default is 0.09
                     'mainInvoice' =>                             # فاکتور به نام خود معامله گر
                         [
-                            'id' => 3620964,                # id of main invoice to be edited
+                            'id' => "{put invoice id}",                # id of main invoice to be edited
                             'reduceInvoiceItemVOs' =>       # بندهای فاکتور مربوط به سهم معامله گر
                                 [
                                     [
-                                        'id' => 111111,                 # the id of item in invoice
-                                        'price' => 100,                 # the share of dealer
-                                        'quantity' => 1,                # count
+                                        'id' => "{put invoice item id}",                 # the id of item in invoice
+                                        'price' => "{put price}",                 # the share of dealer
+                                        'quantity' => "{put quantity}",                # count
                                         'description' => 'put description of item'
                                     ]
                                 ]
@@ -1184,13 +1114,13 @@ function reduceMultiInvoice()
                     'subInvoices' =>            # فاکتورهای مربوط به سهم سایر کسب و کارهای ذینفع
                         [
                             [
-                                'id' => 222222,
+                                'id' => "{put id of sub invoice}",
                                 'reduceInvoiceItemVOs' =>       # بندهای فاکتور مربوط به سهم ذینفعان
                                     [
                                         [
-                                            'id' => 333333,         # the id of item in invoice
-                                            'price' => 100,         # the share of shareholder
-                                            'quantity' => 9,        # count
+                                            'id' => "{put invoice item id}",         # the id of item in invoice
+                                            'price' => "{put price}",         # the share of shareholder
+                                            'quantity' => "{put quantity}",        # count
                                             'description' => 'put description of item'
                                         ]
                                     ]
@@ -1199,9 +1129,9 @@ function reduceMultiInvoice()
                     'customerInvoiceItemVOs' =>         # بندهایی که به مشتری نمایش داده می شوند
                         [
                             [
-                                'id' => 444444,         # the id of item in invoice
-                                'price' => 100,         # he price to be payed by customer
-                                'quantity' => 10,       # count
+                                'id' => "{put invoice item id}",         # the id of item in invoice
+                                'price' => "{put price}",         # he price to be payed by customer
+                                'quantity' => "{put quantity}",       # count
                                 'description' => 'put description of item'
                             ]
 
@@ -1212,11 +1142,11 @@ function reduceMultiInvoice()
     try {
         $result = $BillingService->reduceMultiInvoice($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1231,59 +1161,59 @@ function reduceMultiInvoiceAndCashOut()
 
     $param =
         [
-        ## ========================================= *Required Parameters ==============================================
-        # ***** NOTE : the share of dealer + the share of shareholder = the price to be payed by customer  **** #
+            ## ============================ *Required Parameters  =========================
+            # ***** NOTE : the share of dealer + the share of shareholder = the price to be payed by customer  **** #
             'data' =>
-            [
-                'preferredTaxRate' => 0.09,            # tax to be added between 0 and 1 default is 0.09
-                'mainInvoice' =>                             # فاکتور به نام خود معامله گر
-                    [
-                        'id' => 3620964,                # id of main invoice to be edited
-                        'reduceInvoiceItemVOs' =>       # بندهای فاکتور مربوط به سهم معامله گر
-                            [
-                                [
-                                    'id' => 111111,                 # the id of item in invoice
-                                    'price' => 100,                 # the share of dealer
-                                    'quantity' => 1,                # count
-                                    'description' => 'put description of item'
-                                ]
-                            ]
-                    ],
-                'subInvoices' =>            # فاکتورهای مربوط به سهم سایر کسب و کارهای ذینفع
-                    [
+                [
+                    'preferredTaxRate' => "{put tax, default 0.09}",            # tax to be added between 0 and 1 default is 0.09
+                    'mainInvoice' =>                             # فاکتور به نام خود معامله گر
                         [
-                            'id' => 222222,
-                            'reduceInvoiceItemVOs' =>       # بندهای فاکتور مربوط به سهم ذینفعان
+                            'id' => "{put id of main invoice}",                # id of main invoice to be edited
+                            'reduceInvoiceItemVOs' =>       # بندهای فاکتور مربوط به سهم معامله گر
                                 [
                                     [
-                                        'id' => 333333,         # the id of item in invoice
-                                        'price' => 100,         # the share of shareholder
-                                        'quantity' => 9,        # count
+                                        'id' => "{put invoice item id}",                 # the id of item in invoice
+                                        'price' => "{put price}",                 # the share of dealer
+                                        'quantity' => "{put quantity}",                # count
                                         'description' => 'put description of item'
                                     ]
                                 ]
-                        ]
-                    ],
-                'customerInvoiceItemVOs' =>         # بندهایی که به مشتری نمایش داده می شوند
-                    [
+                        ],
+                    'subInvoices' =>            # فاکتورهای مربوط به سهم سایر کسب و کارهای ذینفع
                         [
-                            'id' => 444444,         # the id of item in invoice
-                            'price' => 100,         # he price to be payed by customer
-                            'quantity' => 10,       # count
-                            'description' => 'put description of item'
-                        ]
+                            [
+                                'id' => "{put id of sub invoice}",
+                                'reduceInvoiceItemVOs' =>       # بندهای فاکتور مربوط به سهم ذینفعان
+                                    [
+                                        [
+                                            'id' => "{put invoice item id}",         # the id of item in invoice
+                                            'price' => "{put price}",         # the share of shareholder
+                                            'quantity' => "{put quantity}",        # count
+                                            'description' => 'put description of item'
+                                        ]
+                                    ]
+                            ]
+                        ],
+                    'customerInvoiceItemVOs' =>         # بندهایی که به مشتری نمایش داده می شوند
+                        [
+                            [
+                                'id' => "{put invoice item id}",         # the id of item in invoice
+                                'price' => "{put price}",         # he price to be payed by customer
+                                'quantity' => "{put quantity}",       # count
+                                'description' => 'put description of item'
+                            ]
 
-                    ],
-            ]
+                        ],
+                ]
         ];
     try {
         $result = $BillingService->reduceMultiInvoiceAndCashOut($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1299,20 +1229,18 @@ function addDealerProductPermission()
 
     $param =
         [
-        ## ========================================= Optional Parameters  ==============================================
-            'productId'         => 11111,            # شناسه محصول
-            'dealerBizId'       => 22222,            # شناسه کسب و کار واسط
-
-
+            ## =========================== Optional Parameters  ===============================
+            'productId'         => "{put product id}",            # شناسه محصول
+            'dealerBizId'       => "{put dealer business id}",            # شناسه کسب و کار واسط
         ];
     try {
         $result = $BillingService->addDealerProductPermission($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1327,23 +1255,23 @@ function dealerProductPermissionList()
 
     $param =
         [
-        ## ========================================= Optional Parameters  ==============================================
-//            'productId'     => 11111,                     # شناسه محصول
-//            'dealerBizId'   => 22222,                     # شناسه کسب و کار واسط
-//            'enable'        => "true/false",              # فعال بودن واسط
-//            'offset'        => 0,                         # شناسه کسب و کار واسط
-//            'size'          => 10,                        # اندازه خروجی
+            ## =========================== Optional Parameters  ===============================
+            'productId'     => "{put product id}",                     # شناسه محصول
+            'dealerBizId'   => "{put dealer business id}",                     # شناسه کسب و کار واسط
+            'enable'        => "true/false",              # فعال بودن واسط
+            'offset'        => "{put offset}",                         # شناسه کسب و کار واسط
+            'size'          => "{put size}",                        # اندازه خروجی
 
 
-    ];
+        ];
     try {
         $result = $BillingService->dealerProductPermissionList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1359,23 +1287,21 @@ function dealingProductPermissionList()
 
     $param =
         [
-        ## ========================================= Optional Parameters  ==============================================
-//            'productId'     => 19474,                     # شناسه محصول
-//            'dealingBusinessId'   => 3605,                # شناسه کسب و کار واسط
-//            'enable'        => "true/false",              # فعال بودن واسط
-//            'offset'        => 0,                         # شناسه کسب و کار واسط
-//            'size'          => 10,                        # اندازه خروجی
-
-
-    ];
+            ## =========================== Optional Parameters  ==========================
+            'productId'     => "{put product id}",                     # شناسه محصول
+            'dealingBusinessId'   => "{put dealer business id}",                # شناسه کسب و کار واسط
+            'enable'        => "true/false",              # فعال بودن واسط
+            'offset'        => "{put offset}",                         # شناسه کسب و کار واسط
+            'size'          => "{put size}",                        # اندازه خروجی
+        ];
     try {
         $result = $BillingService->dealingProductPermissionList($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1391,20 +1317,18 @@ function disableDealerProductPermission()
 
     $param =
         [
-        ## ======================================== *Required Parameters  ==============================================
-            'productId'     => 11111,               # شناسه محصول
-            'dealerBizId'   => 22222,                # شناسه کسب و کار واسط
-
-
+            ## ============================ *Required Parameters  =========================
+            'productId'     => "{put product id}",               # شناسه محصول
+            'dealerBizId'   => "{put dealer business id}",                # شناسه کسب و کار واسط
         ];
     try {
         $result = $BillingService->disableDealerProductPermission($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
@@ -1419,20 +1343,20 @@ function enableDealerProductPermission()
 
     $param =
         [
-            ## ======================================== *Required Parameters  ==============================================
-            'productId'     => 11111,            # شناسه محصول
-            'dealerBizId'   => 22222,                # شناسه کسب و کار واسط
+            ## ============================ *Required Parameters  =========================
+            'productId'     => "{put product id}",            # شناسه محصول
+            'dealerBizId'   => "{put dealer business id}",                # شناسه کسب و کار واسط
 
 
         ];
     try {
         $result = $BillingService->enableDealerProductPermission($param);
         print_r($result);
-    }
-    catch (CustomException $e) {
-        print_r(
-            $e->GetResult()
-        );
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
     }
 }
 
