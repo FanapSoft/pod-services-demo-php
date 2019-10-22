@@ -17,26 +17,160 @@ use Pod\Base\Service\Exception\ValidationException;
 use Pod\Base\Service\Exception\PodException;
 
 
-# set serverType to SandBox or Production
-BaseInfo::initServerType(BaseInfo::PRODUCTION_SERVER);
-
 const API_TOKEN = '{PUT API TOKEN}';
 const ACCESS_TOKEN = '{PUT ACCESS TOKEN}'; # access token will be expired each 15 minutes refresh this token with SSOService->refreshAccessToken
-const TOKEN_ISSUER = 1;
+const TOKEN_ISSUER = '{PUT TOKEN ISSUER}'; # 0 | 1
+
+$baseInfo = new BaseInfo();
+$baseInfo->setToken(API_TOKEN);
+
 
 #  instantiates a DealingService
-$dealingService = new DealingService();
+$DealingService = new DealingService($baseInfo);
+
+# ==================================================== add Dealer  =====================================================
+function addDealer()
+{
+    echo '============================================ add Dealer  ======================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+        ## ============================ *Required Parameters  =========================
+            'dealerBizId'       => '{put dealer business id}',              # شناسه کسب و کار واسط
+        ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'allProductAllow'   => true,             # دسترسی به همه محصولات
+            'scVoucherHash'     => ["{Put Service Call Voucher Hash 1}", "{Put Service Call Voucher Hash 2}"], # service call voucher
+        ];
+    try {
+        $result = $BillingService->addDealer($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ==================================================== dealer List  ====================================================
+function dealerList()
+{
+    echo '============================================ dealer List  ======================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+        ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'dealerBizId'   => '{put dealer business id}',            # The id of business to be a dealer
+            'enable'        => true,            # [true/false]
+            'size'          => '{put size}',              # pagination size, default: 50
+            'offset'        => '{put offset}',               # pagination offset, default: 0
+            'scVoucherHash' => ["{Put Service Call Voucher Hash 1}", "{Put Service Call Voucher Hash 2}"], # service call voucher
+        ];
+    try {
+        $result = $BillingService->dealerList($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# =================================================== enable Dealer  ===================================================
+function enableDealer()
+{
+    echo '=========================================== enable Dealer  ====================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+        ## ============================ *Required Parameters  =========================
+            'dealerBizId'     => '{put dealer business id}',  # The id of dealer business *that is a number*
+        ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+
+        ];
+    try {
+        $result = $BillingService->enableDealer($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# =================================================== disable Dealer  ==================================================
+function disableDealer()
+{
+    echo '=========================================== disable Dealer   ====================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+        ## ============================ *Required Parameters  =========================
+            'dealerBizId'     => '{put business id}',  # The id of dealer business that is a number
+        ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+        ];
+    try {
+        $result = $BillingService->disableDealer($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ============================================= business Dealing List ==================================================
+function businessDealingList()
+{
+    echo '===================================== business Dealing List ====================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+        ## =========================== Optional Parameters  ===============================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'dealingBusinessId' => '{put dealer business id}',            # The id of dealing business
+            'enable'            => true,            # [true/false]
+            'size'              => '{put size}',              # pagination size, default: 50
+            'offset'            => '{put offset}',               # pagination offset, default: 0
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+        ];
+    try {
+        $result = $BillingService->businessDealingList($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
 
 # ================================================ add User And Business ===============================================
 function addUserAndBusiness()
 {
     echo "======================================== add User And Business =================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
-            ## ============================ *Required Parameters  =========================
-            "apiToken"               => API_TOKEN,      # Api_Token
+        ## ============================ *Required Parameters  =========================
             "username"              => 'USER NAME',
             "businessName"          => 'BUSINESS NAME',
             "email"                 => 'EMAIL',
@@ -49,7 +183,8 @@ function addUserAndBusiness()
             "agentFirstName"        => 'AGENT FIRST NAME',
             "agentLastName"         => 'AGENT LAST NAME',
             "agentCellphoneNumber"  => 'AGENT PHONE NUMBER',
-            ## =========================== Optional Parameters  ===========================
+        ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
 #             "tokenIssuer"       => TOKEN_ISSUER,
 #             "firstName"            => 'FIRST NAME',
 #             "lastName"             => 'LAST NAME',
@@ -71,10 +206,11 @@ function addUserAndBusiness()
 #             "lat"                  => 0,
 #             "lng"                  => 0,
 #             "agentNationalCode"    => 'CODE',
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->addUserAndBusiness($param);
+        $result = $DealingService->addUserAndBusiness($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -88,13 +224,12 @@ function addUserAndBusiness()
 function listUserCreatedBusiness()
 {
     echo "==================================== list User Created Business =================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
-            ## ============================ *Required Parameters  =========================
-            "apiToken"               => API_TOKEN,  # Api_Token
             ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
 #            "tokenIssuer"        => TOKEN_ISSUER
 #            "bizId"                 => 'BUSINESS ID',
 #            "username"              => 'USER NAME',
@@ -115,10 +250,11 @@ function listUserCreatedBusiness()
 #            "cellphone"             => '09120000000',
 #            "tags"                  => ['TAG1', 'TAG2'],            # لیست تگ
 #            "tagTrees"              => ['TREE1', 'TREE2'],              # لیست درخت تگ
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->listUserCreatedBusiness($param);
+        $result = $DealingService->listUserCreatedBusiness($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -133,12 +269,11 @@ function listUserCreatedBusiness()
 function updateBusiness()
 {
     echo "============================================ update Business =================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
             ## ============================ *Required Parameters  =========================
-            "apiToken"               => API_TOKEN,                 # Api_Token
             "bizId"                 => '{put business id}',                      # شناسه کسب و کار
             "businessName"          => 'BUSINESS NAME',             # نام کسب و کار
             "guildCode"             => ['GUILD_CODE'],              # لیست کد اصناف
@@ -148,6 +283,7 @@ function updateBusiness()
             "address"               => 'ADDRESS',                            # آدرس
             "description"           => 'DESCRIPTION',                     # توضیحات
             ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
 #            "tokenIssuer"         => TOKEN_ISSUER
 #            "email"                  => 'EMAIL',
 #            "companyName"            => 'COMPANY NAME',            # نام شرکت
@@ -181,11 +317,11 @@ function updateBusiness()
 #            "agentCellphoneNumber"   => 'MOBILE'                   # شماره تلفن نماینده
 #            "agentNationalCode"      => 'CODE'                     # کد ملی نماینده
 #            "changeAgent"            => true | false               # در صورتی که بخواهید نماینده را تغییر دهید true وارد نمایید
-
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->updateBusiness($param);
+        $result = $DealingService->updateBusiness($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -199,19 +335,20 @@ function updateBusiness()
 function getApiTokenForCreatedBusiness()
 {
     echo "=========================== get Api Token For Created Business =================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
             ## ============================ *Required Parameters  =========================
-            "apiToken"               => API_TOKEN,  # Api_Token
             'businessId'            => '{put business id}',            # id of business
             ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
 #            "tokenIssuer"        => TOKEN_ISSUER
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->getApiTokenForCreatedBusiness($param);
+        $result = $DealingService->getApiTokenForCreatedBusiness($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -225,20 +362,22 @@ function getApiTokenForCreatedBusiness()
 function rateBusiness()
 {
     echo "======================================== rate Business ===================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
             ## ============================ *Required Parameters  =========================
-            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
             'businessId'    => '{put business id}',            # id of business
             'rate'          => '{put rate, between 0 and 10}',              # [user rate between 0 and 10]
             ## =========================== Optional Parameters  ===========================
+            # اگر token ارسال نشود از apiToken ی که در کلاس baseInfo ست شده استفاده می شود.
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
 #            "tokenIssuer"        => TOKEN_ISSUER      # default is 1
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->rateBusiness($param);
+        $result = $DealingService->rateBusiness($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -252,20 +391,22 @@ function rateBusiness()
 function commentBusiness()
 {
     echo "====================================== comment Business ===================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
-            ## ============================ *Required Parameters  =========================
-            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
-            'businessId'    => '{put business id}',            # id of business
-            'text'          => "COMMENT",       # [user rate between 0 and 10]
-            ## =========================== Optional Parameters  ===========================
-#            "tokenIssuer"        => TOKEN_ISSUER          # default is 1
-
+        ## ============================ *Required Parameters  =========================
+            'businessId'    => '{put business id}',
+            'text'          => "COMMENT",
+        ## =========================== Optional Parameters  ===========================
+            # اگر token ارسال نشود از apiToken ی که در کلاس baseInfo ست شده استفاده می شود.
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken  #
+            "tokenIssuer"        => TOKEN_ISSUER,          # default is 1
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->commentBusiness($param);
+        $result = $DealingService->commentBusiness($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -279,20 +420,21 @@ function commentBusiness()
 function businessFavorite()
 {
     echo "====================================== business Favorite ===================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
-            ## ============================ *Required Parameters  =========================
-            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
+        ## ============================ *Required Parameters  =========================
             'businessId'            => '{put business id}',                # id of business
             'disfavorite'           => "true/false",        # or true
-            ## =========================== Optional Parameters  ===========================
-#            "tokenIssuer"        => TOKEN_ISSUER      # default is 1
-
+        ## =========================== Optional Parameters  ===========================
+            # توجه: اگر token ارسال نشود از apiToken ی که در کلاس baseInfo ست شده استفاده می شود.
+            "token"                 => 'Access_Token| Api_Token',  # Access_Token | ApiToken  #
+#            "tokenIssuer"          => TOKEN_ISSUER      # default is 1
+            'scVoucherHash'         => ["{Put Service Call Voucher Hash 1}", "{Put Service Call Voucher Hash 2}"], # service call voucher
     ];
     try {
-        $result = $dealingService->businessFavorite($param);
+        $result = $DealingService->businessFavorite($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -306,19 +448,21 @@ function businessFavorite()
 function userBusinessInfos()
 {
     echo "===================================== user BusinessInfos ===================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
-            ## ============================ *Required Parameters  =========================
-            "token"   => 'Access_Token | Api_Token',          # [ACCESS_TOKEN] یا [ACCESS_TOKEN]
+        ## ============================ *Required Parameters  =========================
             "id"        => ["id of business"],                  # id of business
-            ## =========================== Optional Parameters  ===========================
+        ## =========================== Optional Parameters  ===========================
+            # توجه: اگر token ارسال نشود از apiToken ی که در کلاس baseInfo ست شده استفاده می شود.
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
 #            "tokenIssuer"        => TOKEN_ISSUER          # default is 1
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->userBusinessInfos($param);
+        $result = $DealingService->userBusinessInfos($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -332,24 +476,25 @@ function userBusinessInfos()
 function commentBusinessList()
 {
     echo "===================================== comment Business List ================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
             ## ============================ *Required Parameters  =========================
-            "token"           => 'Access_Token | Api_Token',  # [API_TOKEN] یا [ACCESS_TOKEN]
             'businessId'        => "BUSINESS ID",               # id of business
             'offset'            => '{put offset}',                           # [user rate between 0 and 10]
             ## =========================== Optional Parameters  ===========================
+            # توجه: اگر token ارسال نشود از apiToken ی که در کلاس baseInfo ست شده استفاده می شود.
+            "token"       => 'Access_Token| Api_Token',  # Access_Token | ApiToken
             # "tokenIssuer"   => TOKEN_ISSUER              # default is 1
             # "size": 10,
             # "firstId": ID,
             # "lastId" : ID,
-
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
         ];
     try {
-        $result = $dealingService->commentBusinessList($param);
+        $result = $DealingService->commentBusinessList($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -363,19 +508,20 @@ function commentBusinessList()
 function confirmComment()
 {
     echo "======================================= confirm Comment ===================================" .PHP_EOL;
-    global $dealingService;
+    global $DealingService;
 
     $param =
         [
             ## ============================ *Required Parameters  =========================
-            "apiToken"           => API_TOKEN,     # Api_Token
             'commentId'         => '{put comment id}',            # id of comment
             ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
 #            "_token_issuer_"    => TOKEN_ISSUER              # default is 1
-
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
     ];
     try {
-        $result = $dealingService->confirmComment($param);
+        $result = $DealingService->confirmComment($param);
         print_r($result);
     } catch (ValidationException $e) {
         print_r($e->getResult());
@@ -384,3 +530,166 @@ function confirmComment()
         print_r($e->getResult());
     }
 }
+# =============================================== unConfirm Comment =======================================
+function unConfirmComment()
+{
+    echo "======================================= unConfirm Comment ===================================" .PHP_EOL;
+    global $DealingService;
+
+    $param =
+        [
+            ## ============================ *Required Parameters  =========================
+            'commentId'         => '{put comment id}',            # id of comment
+            ## =========================== Optional Parameters  ===========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+#            "_token_issuer_"    => TOKEN_ISSUER              # default is 1
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+    ];
+    try {
+        $result = $DealingService->confirmComment($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ========================================= add Dealer Product Permission ==============================================
+function addDealerProductPermission()
+{
+    echo '================================= add Dealer Product Permission ================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+            ## =========================== Optional Parameters  ===============================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'productId'         => '{put product id}',            # شناسه محصول
+            'dealerBizId'       => '{put dealer business id}',            # شناسه کسب و کار واسط
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+        ];
+    try {
+        $result = $BillingService->addDealerProductPermission($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ====================================== dealer Product Permission List ================================================
+function dealerProductPermissionList()
+{
+    echo '============================== dealer Product Permission List ==================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+            ## =========================== Optional Parameters  ===============================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'productId'     => '{put product id}',                     # شناسه محصول
+            'dealerBizId'   => '{put dealer business id}',                     # شناسه کسب و کار واسط
+            'enable'        => 'true/false',              # فعال بودن واسط
+            'offset'        => '{put offset}',                         # شناسه کسب و کار واسط
+            'size'          => '{put size}',                        # اندازه خروجی
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+
+        ];
+    try {
+        $result = $BillingService->dealerProductPermissionList($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ====================================== dealing Product Permission List ===============================================
+function dealingProductPermissionList()
+{
+    echo '============================== dealing Product Permission List ==================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+            ## =========================== Optional Parameters  ==========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'productId'     => '{put product id}',                     # شناسه محصول
+            'dealingBusinessId'   => '{put dealer business id}',                # شناسه کسب و کار واسط
+            'enable'        => 'true/false',              # فعال بودن واسط
+            'offset'        => '{put offset}',                         # شناسه کسب و کار واسط
+            'size'          => '{put size}',                        # اندازه خروجی
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+        ];
+    try {
+        $result = $BillingService->dealingProductPermissionList($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ===================================== disable dealer Product Permission ==============================================
+function disableDealerProductPermission()
+{
+    echo '============================= disable dealer Product Permission =================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+            ## ============================ *Required Parameters  =========================
+            'apiToken'          => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'productId'     => '{put product id}',               # شناسه محصول
+            'dealerBizId'   => '{put dealer business id}',                # شناسه کسب و کار واسط
+            'scVoucherHash'     => ['{Put Service Call Voucher Hashes}'],
+            'scApiKey'           => '{Put service call Api Key}',
+        ];
+    try {
+        $result = $BillingService->disableDealerProductPermission($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+
+# ===================================== enable dealer Product Permission ===============================================
+function enableDealerProductPermission()
+{
+    echo '============================= enable dealer Product Permission =================================' .PHP_EOL;
+    global $BillingService;
+
+    $param =
+        [
+            ## ============================ *Required Parameters  =========================
+            'apiToken'      => '{Put API TOKEN}', # امکان تغییر apiToken در اینجا وجود دارد
+            'productId'     => '{put product id}',            # شناسه محصول
+            'dealerBizId'   => '{put dealer business id}',                # شناسه کسب و کار واسط
+            'scVoucherHash' => ["{Put Service Call Voucher Hash 1}", "{Put Service Call Voucher Hash 2}"], # service call voucher
+        ];
+    try {
+        $result = $BillingService->enableDealerProductPermission($param);
+        print_r($result);
+    } catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}
+

@@ -10,11 +10,6 @@ use Pod\Base\Service\BaseInfo;
 use Pod\Base\Service\Exception\ValidationException;
 use Pod\Base\Service\Exception\PodException;
 
-
-# set serverType to SandBox or Production
-BaseInfo::initServerType(BaseInfo::PRODUCTION_SERVER);
-$baseInfo->setTokenIssuer(TOKEN_ISSUER);
-
 $baseInfo = new BaseInfo();
 $baseInfo->setToken(API_TOKEN);
 $baseInfo->setTokenIssuer(TOKEN_ISSUER);
@@ -32,50 +27,51 @@ function addProduct()
     $param =
         [
             ## ============================ *Required Parameters  =============================
-            'token'                 => '{Put ApiToken}',
-            'name'                  => '{Put product name}',
-            'canComment'            => '{true/false}',
-            'canLike'               => '{true/false}',
-            'enable'                => '{true/false}',
-            'availableCount'        => '{Put available count}',
-            'price'                 => '{Put price}',
-            'discount'              => '{Put discount}',
+            'name'                  => 'Put product name',
+            'canComment'            => 'true/false',
+            'canLike'               => 'true/false',
+            'enable'                => 'true/false',
+            'availableCount'        => 'Put available count',
+            'price'                 => 'Put price',
+            'discount'              => 'Put discount',
             ## =========================== Optional Parameters  ================================
-#            'guildCode'             => '{Put guild code}',
-#            'parentProductId'       => '{Put parent product id}',
-            'description'           => '{Put product description}',
-#            'uniqueId'              => '{Put unique id}',
-            'metaData'              => '{Put json string like : {"test":"true"}}',
-            'businessId'            => '{Put business id}',
-#            'unlimited'             => '{true/false}',     # default : false
-#            'allowUserInvoice'      =>  '{true/false}',    # default : false
-#            'allowUserPrice'        =>  '{true/false}',    # default : false
-#            'currencyCode'          => '{Put currency code}',
-            'attTemplateCode'       => '{Put attribute template code}',
-            'attributes'            =>
-            [
-                [
-                    'attCode'       => '{Put attribute code}',
-                    'attValue'      => '{Put attribute value}',
-                    'attGroup'      =>  '{true/false}',
-                ],
-                [
-                    'attCode'       => '{Put attribute code}',
-                    'attValue'      => '{Put attribute value}',
-                    'attGroup'      =>  '{true/false}',
-                ]
-
-            ],
-#            'lat'                   => '{Put Latitude}',
-#            'lng'                   => '{Put Longitude}',
-            'tags'                  => '{Put tags separated with comma}',
-#            'content'               => '{Put content}',
-#            'previewImage'          => '{Put image address}',
-#            'tagTrees'              => '{Put tag trees name separated with comma}',
-#            'tagTreeCategoryName'   => '{Put tag tree category name}',
-#            'preferredTaxRate'      => '{Put tax rate default is 0.09}',
-#            'quantityPrecision'     => '{Put decimal digits of quantity}',
-
+#            'apiToken'              => 'Put ApiToken',
+#            'guildCode'             => 'Put guild code',
+#            'parentProductId'       => 'Put parent product id',
+#            'description'           => 'Put product description',
+#            'uniqueId'              => 'Put unique id',
+#            'metaData'              => 'Put json string like : {"test":"true"}',
+#            'businessId'            => 'Put business id',
+#            'unlimited'             => 'true/false',     # default : false
+#            'allowUserInvoice'      =>  'true/false',    # default : false
+#            'allowUserPrice'        =>  'true/false',    # default : false
+#            'currencyCode'          => 'Put currency code',
+#            'attTemplateCode'       => 'Put attribute template code',
+#            'attributes'            =>
+#            [
+#                [
+#                    'attCode'       => 'Put attribute code',
+#                    'attValue'      => 'Put attribute value',
+#                    'attGroup'      =>  'true/false',
+#                ],
+#                [
+#                    'attCode'       => 'Put attribute code',
+#                    'attValue'      => 'Put attribute value',
+#                    'attGroup'      =>  'true/false',
+#                ]
+#
+#            ],
+#            'lat'                   => 'Put Latitude',
+#            'lng'                   => 'Put Longitude',
+#            'tags'                  => 'Put tags separated with comma',
+#            'content'               => 'Put content',
+#            'previewImage'          => 'Put image address',
+#            'tagTrees'              => 'Put tag trees name separated with comma',
+#            'tagTreeCategoryName'   => 'Put tag tree category name',
+#            'preferredTaxRate'      => 'Put tax rate default is 0.09',
+#            'quantityPrecision'     => 'Put decimal digits of quantity',
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->addProduct($param);
@@ -89,9 +85,6 @@ function addProduct()
     }
 }
 
-#addProduct();
-#die();
-
 # ============================================== add Sub Product =========================================
 function addSubProduct()
 {
@@ -101,47 +94,46 @@ function addSubProduct()
     $param =
         [
             ## ============================ *Required Parameters  =============================
-            'token'                 => '{Put ApiToken}',
-            'name'                  => '{Put product name}',
-            'availableCount'        => '{Put available count}',
-            'price'                 => '{Put price}',
-            'discount'              => '{Put discount}',
-#            'groupId'               => '{Put group id}',
+            'name'                  => 'Put product name',
+            # ‌یکی از دو فیلد unlimited و availableCount اجباری است
+            'unlimited'             => 'true/false',     # default : false
+            'availableCount'        => 'Put available count',
+            'price'                 => 'Put price',
+            'discount'              => 'Put discount',
+            'groupId'               => 'Put group id',
             ## =========================== Optional Parameters  ================================
-#            'guildCode'             => '{Put guild code}',
-#            'parentProductId'       => '{Put parent product id}',
-        'description'           => '{Put product description}',
-#            'uniqueId'              => '{Put unique id}',
-        'metaData'              => '{Put json string like : {"test":"true"}}',
-        'businessId'            => '{Put business id}',
-#            'unlimited'             => '{true/false}',     # default : false
-#            'allowUserInvoice'      =>  '{true/false}',    # default : false
-#            'allowUserPrice'        =>  '{true/false}',    # default : false
-#            'currencyCode'          => '{Put currency code}',
-        'attributes'            =>
-            [
-                [
-                    'attCode'       => '{Put attribute code}',
-                    'attValue'      => '{Put attribute value}',
-                    'attGroup'      =>  '{true/false}',
-                ],
-                [
-                    'attCode'       => '{Put attribute code}',
-                    'attValue'      => '{Put attribute value}',
-                    'attGroup'      =>  '{true/false}',
-                ]
-
-            ],
-#            'lat'                   => '{Put Latitude}',
-#            'lng'                   => '{Put Longitude}',
-        'tags'                  => '{Put tags separated with comma}',
-#            'content'               => '{Put content}',
-#            'previewImage'          => '{Put image address}',
-#            'tagTrees'              => '{Put tag trees name separated with comma}',
-#            'tagTreeCategoryName'   => '{Put tag tree category name}',
-#            'preferredTaxRate'      => '{Put tax rate default is 0.09}',
-#            'quantityPrecision'     => '{Put decimal digits of quantity}',
-
+#            'apiToken'              => 'Put ApiToken',
+#            'guildCode'             => 'Put guild code',
+#            'parentProductId'       => 'Put parent product id',
+#            'description'           => 'Put product description',
+#            'uniqueId'              => 'Put unique id',
+#            'metaData'              => 'Put json string like : {"test":"true"}',
+#            'businessId'            => 'Put business id',
+#            'allowUserInvoice'      => 'true/false',    # default : false
+#            'allowUserPrice'        => 'true/false',    # default : false
+#            'currencyCode'          => 'Put currency code',
+#            'attributes'            =>
+#            [
+#                [
+#                    'attCode'       => 'Put attribute code',
+#                    'attValue'      => 'Put attribute value',
+#                    'attGroup'      =>  'true/false',
+#                ],
+#                [
+#                    'attCode'       => 'Put attribute code',
+#                    'attValue'      => 'Put attribute value',
+#                    'attGroup'      =>  'true/false',
+#                ]
+#            ],
+#            'tags'                  => 'Put tags separated with comma',
+#            'content'               => 'Put content',
+#            'previewImage'          => 'Put image address',
+#            'tagTrees'              => 'Put tag trees name separated with comma',
+#            'tagTreeCategoryName'   => 'Put tag tree category name',
+#            'preferredTaxRate'      => 'Put tax rate default is 0.09',
+#            'quantityPrecision'     => 'Put decimal digits of quantity',
+#            'scVoucherHash'        => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'             => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->addSubProduct($param);
@@ -154,8 +146,7 @@ function addSubProduct()
         print_r($e->getResult());
     }
 }
-#addSubProduct();
-#die();
+
 # ============================================ add Products ==============================================
 function addProducts()
 {
@@ -164,59 +155,61 @@ function addProducts()
 
     $param = [
         ## ============================ *Required Parameters  =============================
-        'token'                 => '{Put apiToken}',
         'data' => [
             [
-            'name'                  => '{Put product name}',
-            'canComment'            => '{true/false}',
-            'canLike'               => '{true/false}',
-            'enable'                => '{true/false}',
-            'availableCount'        => '{Put available count}',
-            'price'                 => '{Put price}',
-            'discount'              => '{Put discount}',
-        ## =========================== Optional Parameters  ===============================
-#            'guildCode'             => '{Put guild code}',
-#            'parentProductId'       => '{Put parent product id}',
-#            'description'           => '{Put product description}',
-#            'uniqueId'              => '{Put unique id}',
-#            'metaData'              => '{Put json string like : {"test":"true"}}',
-#            'businessId'            => '{Put business id}',
-#            'unlimited'             => '{true/false}',     # default : false
-#            'allowUserInvoice'      =>  '{true/false}',    # default : false
-#            'allowUserPrice'        =>  '{true/false}',    # default : false
-#            'currencyCode'          => '{Put currency code}',
-#            'attTemplateCode'       => '{Put attribute template code}',
+            'name'                  => 'Put product name',
+            'canComment'            => 'true/false',
+            'canLike'               => 'true/false',
+            'enable'                => 'true/false',
+            'availableCount'        => 'Put available count',
+            'price'                 => 'Put price',
+            'discount'              => 'Put discount',
+        ## ============ Optional Parameters  ============
+#            'guildCode'             => 'Put guild code',
+#            'parentProductId'       => 'Put parent product id',
+#            'description'           => 'Put product description',
+#            'uniqueId'              => 'Put unique id',
+#            'metaData'              => 'Put json string like : {"test":"true"}',
+#            'businessId'            => 'Put business id',
+#            'unlimited'             => 'true/false',     # default : false
+#            'allowUserInvoice'      =>  'true/false',    # default : false
+#            'allowUserPrice'        =>  'true/false',    # default : false
+#            'currencyCode'          => 'Put currency code',
+#            'attTemplateCode'       => 'Put attribute template code',
 #            'attributes'            =>
 #                [
 #                    [
-#                        'attCode'       => '{Put attribute code}',
-#                        'attValue'      => '{Put attribute value}',
-#                        'attGroup'      =>  '{true/false}',
+#                        'attCode'       => 'Put attribute code',
+#                        'attValue'      => 'Put attribute value',
+#                        'attGroup'      =>  'true/false',
 #                    ],
 #                    [
-#                        'attCode'       => '{Put attribute code}',
-#                        'attValue'      => '{Put attribute value}',
-#                        'attGroup'      =>  '{true/false}',
+#                        'attCode'       => 'Put attribute code',
+#                        'attValue'      => 'Put attribute value',
+#                        'attGroup'      =>  'true/false',
 #                    ]
 #                ],
-#            'groupId'               => '{Put group id}',
-#            'lat'                   => '{Put Latitude}',
-#            'lng'                   => '{Put Longitude}',
-#            'tags'                  => '{Put tags separated with comma}',
-#            'content'               => '{Put content}',
-#            'previewImage'          => '{Put image address}',
-#            'tagTrees'              => '{Put tag trees name separated with comma}',
-#            'tagTreeCategoryName'   => '{Put tag tree category name}',
-#            'preferredTaxRate'      => '{Put tax rate default is 0.09}',
-#            'quantityPrecision'     => '{Put decimal digits of quantity}',
+#            'groupId'               => 'Put group id',
+#            'lat'                   => 'Put Latitude',
+#            'lng'                   => 'Put Longitude',
+#            'tags'                  => 'Put tags separated with comma',
+#            'content'               => 'Put content',
+#            'previewImage'          => 'Put image address',
+#            'tagTrees'              => 'Put tag trees name separated with comma',
+#            'tagTreeCategoryName'   => 'Put tag tree category name',
+#            'preferredTaxRate'      => 'Put tax rate default is 0.09',
+#            'quantityPrecision'     => 'Put decimal digits of quantity',
 
             ], [
                 # اطلاعات محصول بعدی ...
-            ]
-        ]
+            ],
+      ## =========================== Optional Parameters  ===============================
+#            'apiToken'              => 'Put ApiToken',
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
 
-    ]
-    ;
+        ]
+    ];
     try {
         $result = $ProductService->addProducts($param);
         print_r($result);
@@ -229,9 +222,6 @@ function addProducts()
     }
 }
 
-#addProducts();
-#die();
-
 # =============================================== update Product =============================================
 function updateProduct()
 {
@@ -241,53 +231,55 @@ function updateProduct()
     $param =
         [
             ## ============================ *Required Parameters  =============================
-            'token'                 => '{Put apiToken}',
-            'entityId'              => '{Put entity Id of product}',
-            'name'                  => '{Put product name}',
-            'description'           => '{Put product description}',
-            'canComment'            => '{true/false}',
-            'canLike'               => '{true/false}',
-            'enable'                => '{true/false}',
-            'price'                 => '{Put product price}',
-            'discount'              => '{Put discount}',
-            'changePreview'         => '{true/false}',
+            'entityId'              => 'Put entity Id of product',
+            'name'                  => 'Put product name',
+            'description'           => 'Put product description',
+            'canComment'            => 'true/false',
+            'canLike'               => 'true/false',
+            'enable'                => 'true/false',
+            'price'                 => 'Put product price',
+            'discount'              => 'Put discount',
+            'changePreview'         => 'true/false',
 #            'availableCount'        => 200,  # تعداد موجود از محصول درصورت بدون محدودیت نبودن اجباری است
-        'unlimited'             => '{true/false}', # بدون محدودیت بودن محصول true/false
+            'unlimited'             => 'true/false', # بدون محدودیت بودن محصول true/false
         ## =========================== Optional Parameters  ================================
+#            'apiToken'              => 'Put ApiToken',
 #            'guildCode'             => 'FOOD_GUILD',
-        'version'               => 4,
-#            'uniqueId'              => '{Put unique id}',
-#            'metaData'              => '{Put Metadata(json string)}',
-#            'businessId'            => '{Put business id}',
-#            'allowUserInvoice'      => '{true/false}',
-#            'allowUserPrice'        => '{true/false}',
-                    # توجه: درصورتی که محصول قالب نداشته باشد قابل اضافه شدن است
+#            'version'               => 4,
+#            'uniqueId'              => 'Put unique id',
+#            'metaData'              => 'Put Metadata(json string)',
+#            'businessId'            => 'Put business id',
+#            'allowUserInvoice'      => 'true/false',
+#            'allowUserPrice'        => 'true/false',
+        # توجه: درصورتی که محصول قالب نداشته باشد قابل اضافه شدن است
 # در غیر این صورت قابل تغییر نمی باشد فقط مقادیر مشخصه های آن قالب را می توان تغییر داد
-#            'attTemplateCode'       => '{Put attribute template code}',
+#            'attTemplateCode'       => 'Put attribute template code',
 #            'attributes'            =>
 #                [
 #                    [
-#                        'attCode'       => '{Put attribute code}',
-#                        'attValue'      => '{Put attribute value}',
-#                        'attGroup'      =>  '{true/false}',
+#                        'attCode'       => 'Put attribute code',
+#                        'attValue'      => 'Put attribute value',
+#                        'attGroup'      =>  'true/false',
 #                    ],
 #                    [
-#                        'attCode'       => '{Put attribute code}',
-#                        'attValue'      => '{Put attribute value}',
-#                        'attGroup'      =>  '{true/false}',
+#                        'attCode'       => 'Put attribute code',
+#                        'attValue'      => 'Put attribute value',
+#                        'attGroup'      =>  'true/false',
 #                    ]
 #                ],
 #            'categories'            => ['cat1', 'cat2', ...],
-#            'groupId'               => '{Put group id}',
-#            'lat'                   => '{Put Latitude}',
-#            'lng'                   => '{Put Longitude}',
-#            'tags'                  => '{Put tags separated with comma}',
-#            'content'               => '{Put content}',
-#            'previewImage'          => '{Put image address}',
-#            'tagTrees'              => '{Put tag trees name separated with comma}',
-#            'tagTreeCategoryName'   => '{Put tag tree category name}',
-#            'preferredTaxRate'      => '{Put tax rate default is 0.09}',
-#            'quantityPrecision'     => '{Put decimal digits of quantity}',
+#            'groupId'               => 'Put group id',
+#            'lat'                   => 'Put Latitude',
+#            'lng'                   => 'Put Longitude',
+#            'tags'                  => 'Put tags separated with comma',
+#            'content'               => 'Put content',
+#            'previewImage'          => 'Put image address',
+#            'tagTrees'              => 'Put tag trees name separated with comma',
+#            'tagTreeCategoryName'   => 'Put tag tree category name',
+#            'preferredTaxRate'      => 'Put tax rate default is 0.09',
+#            'quantityPrecision'     => 'Put decimal digits of quantity',
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->updateProduct($param);
@@ -301,9 +293,6 @@ function updateProduct()
     }
 }
 
-#updateProduct();
-#die();
-
 # ============================================ update Products ====================================================
 function updateProducts()
 {
@@ -312,116 +301,64 @@ function updateProducts()
 
     $param =
         [
-            'token'                 => '4d3d6b85e2e844b0ade83cc2ec5b4c85',
             'data' =>
-                [[
+                [        [
                     ## ============================ *Required Parameters  =============================
-                    'entityId'              => 31588,
-                    'name'                  => 'محصول ویرایش شده',
-                    'description'           => 'ویرایش محصول',
-                    'canComment'            => false,
-                    'canLike'               => false,
-                    'enable'                => true,
-                    'price'                 => 40000,
-                    'discount'              => 10,
-                    'changePreview'         => true,
+                    'entityId'              => 'Put entity Id of product',
+                    'name'                  => 'Put product name',
+                    'description'           => 'Put product description',
+                    'canComment'            => 'true/false',
+                    'canLike'               => 'true/false',
+                    'enable'                => 'true/false',
+                    'price'                 => 'Put product price',
+                    'discount'              => 'Put discount',
+                    'changePreview'         => 'true/false',
 #            'availableCount'        => 200,  # تعداد موجود از محصول درصورت بدون محدودیت نبودن اجباری است
-                    'unlimited'             => true, # بدون محدودیت بودن محصول true/false
+                    'unlimited'             => 'true/false', # بدون محدودیت بودن محصول true/false
                     ## =========================== Optional Parameters  ================================
+#            'apiToken'              => 'Put ApiToken',
 #            'guildCode'             => 'FOOD_GUILD',
-#                'version'               => 7,
-#            'uniqueId'              => '',
-#            'metaData'              => '',
-#            'businessId'            => '',
-#            'allowUserInvoice'      => '',
-#            'allowUserPrice'        => '',
-                    'attTemplateCode'       => 'مانتو',
-                    'attributes'            =>
-                        [
-                            [
-                                'attCode'       => 'gender',
-                                'attValue'      => 'زن',
-                                'attGroup'      => false,
-                            ],
-                            [
-                                'attCode'       => 'color',
-                                'attValue'      => 'سبز',
-                                'attGroup'      => false,
-                            ],
-
-                            [
-                                'attCode'       => 'size',
-                                'attValue'      => 'L',
-                                'attGroup'      => true,
-                            ],
-
-                        ],
-#            'groupId'               => '',
-#            'categories'            => [],
-#            'lat'                   => '',
-#            'lng'                   => '',
-#            'tags'                  => '',
-#            'content'               => '',
-#            'previewImage'          => '',
-#            'tagTrees'              => '',
-#            'tagTreeCategoryName'   => '',
-#            'preferredTaxRate'      => '',
-#            'quantityPrecision'     => '',
-                ],
-                    [
-                        ## ============================ *Required Parameters  =============================
-                        'entityId'              => 31653,
-                        'name'                  => 'محصول ویرایش شده',
-                        'description'           => 'ویرایش محصول',
-                        'canComment'            => false,
-                        'canLike'               => false,
-                        'enable'                => true,
-                        'price'                 => 40000,
-                        'discount'              => 10,
-                        'changePreview'         => true,
-#            'availableCount'        => 200,  # تعداد موجود از محصول درصورت بدون محدودیت نبودن اجباری است
-                        'unlimited'             => true, # بدون محدودیت بودن محصول true/false
-                        ## =========================== Optional Parameters  ================================
-#            'guildCode'             => 'FOOD_GUILD',
-#                'version'               => 6,
-#            'uniqueId'              => '',
-#            'metaData'              => '',
-#            'businessId'            => '',
-#            'allowUserInvoice'      => '',
-#            'allowUserPrice'        => '',
-                        'attTemplateCode'       => 'مانتو',
-                        'attributes'            =>
-                            [
-                                [
-                                    'attCode'       => 'gender',
-                                    'attValue'      => 'زن',
-                                    'attGroup'      => false,
-                                ],
-                                [
-                                    'attCode'       => 'color',
-                                    'attValue'      => 'سبز',
-                                    'attGroup'      => false,
-                                ],
-
-                                [
-                                    'attCode'       => 'size',
-                                    'attValue'      => 'L',
-                                    'attGroup'      => true,
-                                ],
-
-                            ],
-#            'groupId'               => '',
-#            'categories'            => [],
-#            'lat'                   => '',
-#            'lng'                   => '',
-#            'tags'                  => '',
-#            'content'               => '',
-#            'previewImage'          => '',
-#            'tagTrees'              => '',
-#            'tagTreeCategoryName'   => '',
-#            'preferredTaxRate'      => '',
-#            'quantityPrecision'     => '',
-                    ]]
+#            'version'               => 4,
+#            'uniqueId'              => 'Put unique id',
+#            'metaData'              => 'Put Metadata(json string)',
+#            'businessId'            => 'Put business id',
+#            'allowUserInvoice'      => 'true/false',
+#            'allowUserPrice'        => 'true/false',
+                    # توجه: درصورتی که محصول قالب نداشته باشد قابل اضافه شدن است
+# در غیر این صورت قابل تغییر نمی باشد فقط مقادیر مشخصه های آن قالب را می توان تغییر داد
+#            'attTemplateCode'       => 'Put attribute template code',
+#            'attributes'            =>
+#                [
+#                    [
+#                        'attCode'       => 'Put attribute code',
+#                        'attValue'      => 'Put attribute value',
+#                        'attGroup'      =>  'true/false',
+#                    ],
+#                    [
+#                        'attCode'       => 'Put attribute code',
+#                        'attValue'      => 'Put attribute value',
+#                        'attGroup'      =>  'true/false',
+#                    ]
+#                ],
+#            'categories'            => ['cat1', 'cat2', ...],
+#            'groupId'               => 'Put group id',
+#            'lat'                   => 'Put Latitude',
+#            'lng'                   => 'Put Longitude',
+#            'tags'                  => 'Put tags separated with comma',
+#            'content'               => 'Put content',
+#            'previewImage'          => 'Put image address',
+#            'tagTrees'              => 'Put tag trees name separated with comma',
+#            'tagTreeCategoryName'   => 'Put tag tree category name',
+#            'preferredTaxRate'      => 'Put tax rate default is 0.09',
+#            'quantityPrecision'     => 'Put decimal digits of quantity',
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
+                ], # ... اطلاعات محصول بعدی
+            ],
+            ## =========================== Optional Parameters  ===============================
+            'apiToken'              => 'Put ApiToken',
+            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+            'scApiKey'           => 'Put service call Api Key',
         ];
     try {
         $result = $ProductService->updateProducts($param);
@@ -435,9 +372,6 @@ function updateProducts()
     }
 }
 
-#updateProducts();
-#die();
-
 # ============================================= get product List ================================================
 function getProductList()
 {
@@ -445,30 +379,36 @@ function getProductList()
     global $ProductService;
 
     $param =
-        [## ============================ *Required Parameters  =============================
-            'token'                 => '4d3d6b85e2e844b0ade83cc2ec5b4c85', # ApiToken or AccessToken
-            'size'                  => 50,
-            'offset'                => 0,
-            ## ============================= Optional Parameters  ==============================
-#            'id'                    => [31653,31654],
-#            'businessId'            => 3612, # خطا میده
-#            'uniqueId'              => '',
-#            'categoryCode'          => [],
-#            'guildCode'             => ['CLOTHING_GUILD', 'FOOD_GUILD'],
-#            'currencyCode'          => '',
-#            'firstId'               => 24472, # خطا میده
-#            'lastId'                => 31650,
-#            'attributeTemplateCode' => '',
+        [
+        ## ============================ *Required Parameters  =============================
+            # یکی از این چهار فیلد اجباری است
+            'offset'                => 'Put offset',
+            'firstId'               => 'Put first id',
+            'lastId'                => 'Put last id',
+            'id'                    => ['{Put product entity ids}'],
+        ## ============================= Optional Parameters  ==============================
+#            "token"                 => "{Put AccessToken | ApiToken}", # for this service you can use AccessToken
+#            'size'                  => 50,
+#            'businessId'            => 'Put business id',
+#            'uniqueId'              => 'Put product unique id',
+#            'categoryCode'          => [{Put product category codes}],
+#            'guildCode'             => [{Put guild codes}],
+#            'currencyCode'          => 'Put currency code',
+#            'firstId'               => 'Put first id',
+#            'lastId'                => 'Put last id',
+#            'attributeTemplateCode' => 'Put attribute template code',
 #            'attributes'            => [
 #                [
-#                    'attributeCode'   => 'gender',
-#                    'attributeValue'  => 'زن',
+#                    'attributeCode'   => 'Put attribute code',
+#                    'attributeValue'  => 'Put attribute value',
 #                ],
 #             ],
-#            'orderByLike'           => 'asc', # خطا میده
-        'orderByPrice'          => 'asc', # خطا میده
-        'tags'                  => ['tag1'],
-#            'tagTrees'              => [],
+#            'orderByLike'           => 'put asc/desc',
+#            'orderByPrice'          => 'put asc/desc',
+#            'tags'                  => [Put tags1, Put tags2, ..],
+#            'tagTrees'              => [Put tags tree1, Put tags tree2, ..],
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->getProductList($param);
@@ -481,8 +421,6 @@ function getProductList()
         print_r($e->getResult());
     }
 }
-#getProductList();
-#die();
 
 # ============================================ business ProductList ====================================================
 function getBusinessProductList()
@@ -492,35 +430,35 @@ function getBusinessProductList()
 
     $param =
         [## ============================ *Required Parameters  =============================
-            'token'                 => '4d3d6b85e2e844b0ade83cc2ec5b4c85', # ApiToken or AccessToken
-#            'size'                  => 50,
-        'offset'                => 0,
+            # یکی از این چهار فیلد اجباری است
+            'offset'                => 'Put offset',
+#            'firstId'               => 'Put first id',
+#            'lastId'                => 'Put last id',
+#            'id'                    => [{Put product entity ids}],
         ## ============================= Optional Parameters  ==============================
-#            'id'                    => [31653,31654],
-#            'businessId'            => 3612,
-#            'uniqueId'              => '',
-#            'categoryCode'          => [],
-#            'guildCode'             => ['CLOTHING_GUILD', 'FOOD_GUILD'],
-#            'currencyCode'          => '',
-#            'firstId'               => 31653,
-#            'lastId'                => '',
-#            'attributeTemplateCode' => '',
-#        'attributes'            => [
-#            [
-#                'attributeCode'   => 'gender',
-#                'attributeValue'  => 'زن',
-#            ],
-#        ],
-        'orderBySale'           => 'asc',
-#            'orderByLike'           => 'asc', # خطا میده
-#            'orderByPrice'          => 'desc', # خطا میده
-#            'tags'                  => ['tag1'],
-#            'tagTrees'              => [],
-        'scope'                 => 'DEALER_PRODUCT_PERMISSION',
-#            'attributeSearchQuery'  => '',
-#            'scVoucherHash'         => '',
-#            'scApiKey'              => '',
-
+#            'apiToken'              => 'Put ApiToken',
+#            'size'                  => 'Put output size',
+#            'businessId'            => 'Put business id',
+#            'uniqueId'              => 'Put product unique id',
+#            'categoryCode'          => [{Put product category codes}],
+#            'guildCode'             => [{Put guild codes}],
+#            'currencyCode'          => 'Put currency code',
+#            'attributeTemplateCode' => 'Put attribute template code',
+#            'attributes'            => [
+#                [
+#                    'attributeCode'   => 'Put attribute code',
+#                    'attributeValue'  => 'Put attribute value',
+#                ],
+#             ],
+#            'orderBySale'           => 'put asc/desc',
+#            'orderByLike'           => 'put asc/desc',
+#            'orderByPrice'          => 'put asc/desc',
+#            'tags'                  => ['Put tags1', 'Put tags2', ..],
+#            'tagTrees'              => ['Put tags tree1', 'Put tags tree2', ..],
+#            'scope'                 => 'Put scope',
+#            'attributeSearchQuery'  => 'Put search query',
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->getBusinessProductList($param);
@@ -534,9 +472,6 @@ function getBusinessProductList()
     }
 }
 
-getBusinessProductList();
-die();
-
 # ======================================== attribute Template List ===================================================
 function getAttributeTemplateList()
 {
@@ -544,14 +479,17 @@ function getAttributeTemplateList()
     global $ProductService;
 
     $param =
-        [## ============================ *Required Parameters  =============================
-            'token'                 => '4d3d6b85e2e844b0ade83cc2ec5b4c85', # ApiToken or AccessToken
-#            'size'                  => 50,
-#            'offset'                => 0,
+        [
+        ## ============================ *Required Parameters  =============================
+            # یکی از این سه فیلد اجباری است
+            'offset'                => 'Put offset',
+            'firstId'               => 'Put first id',
+            'lastId'                => 'Put last id',
         ## =========================== Optional Parameters  ================================
-#        'firstId'               => 40,
-#            'lastId'                => 100,  # id هارو نمایش نمیده که بر اساس اونها مرتب کنیم
-
+#            "token"                 => "{Put AccessToken | ApiToken}", # for this service you can use AccessToken
+#            'size'                  => 'Put output size',
+#            'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#            'scApiKey'           => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->getAttributeTemplateList($param);
@@ -565,9 +503,6 @@ function getAttributeTemplateList()
     }
 }
 
-#getAttributeTemplateList();
-#die();
-
 # ======================================== search Product ===================================================
 function searchProduct()
 {
@@ -576,31 +511,34 @@ function searchProduct()
 
     $param =
         [## ============================ *Required Parameters  =============================
-            'token'                 => '4d3d6b85e2e844b0ade83cc2ec5b4c85', # ApiToken or AccessToken
-#            'size'                  => 50,
-#            'offset'                => 0,
+            # یکی از این چهار فیلد اجباری است
+            'offset'                => 'Put offset',
+#            'firstId'               => 'Put first id',
+#            'lastId'                => 'Put last id',
+#            'id'                    => [Put product entity ids],
         ## ============================= Optional Parameters  ==============================
-#            'q'                    => 'pod',
-        'id'                    => [24523,24475],
-#            'businessId'            => 3612, # خطا میده
-#            'uniqueId'              => '',
-#            'categoryCode'          => [],
-#            'guildCode'             => ['CLOTHING_GUILD', 'FOOD_GUILD'],
-#            'currencyCode'          => '',
-#            'firstId'               => 24472, # خطا میده
-#            'lastId'                => 31650,
-#            'attributeTemplateCode' => '',
-        'attributes'            => [
-            [
-                'attributeCode'   => 'gender',
-                'attributeValue'  => 'زن',
-            ],
-        ],
-#            'orderByLike'           => 'asc', # خطا میده
-#        'orderByPrice'          => 'asc', # خطا میده
-        'orderBySale'           => 'asc',
-#        'tags'                  => ['tag1'],
-#            'tagTrees'              => [],
+#            "token"                 => "{Put AccessToken | ApiToken}", # for this service you can use AccessToken     
+#            'query'                 => 'Put search query',
+#            'size'                  => 'Put output size',
+#            'businessId'            => 'Put business id',
+#            'uniqueId'              => 'Put product unique id',
+#            'categoryCode'          => [{Put product category codes}],
+#            'guildCode'             => [{Put guild codes}],
+#            'currencyCode'          => 'Put currency code',
+#            'attributeTemplateCode' => 'Put attribute template code',
+#            'attributes'            => [
+#                [
+#                    'attributeCode'   => 'Put attribute code',
+#                    'attributeValue'  => 'Put attribute value',
+#                ],
+#             ],
+#            'orderBySale'           => 'put asc/desc',
+#            'orderByLike'           => 'put asc/desc',
+#            'orderByPrice'          => 'put asc/desc',
+#            'tags'                  => ['Put tags1', 'Put tags2', ..],
+#            'tagTrees'              => ['Put tags tree1', 'Put tags tree2', ..],
+#           'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#           'scApiKey'           => 'Put service call Api Key',
     ];
     try {
         $result = $ProductService->searchProduct($param);
@@ -614,5 +552,39 @@ function searchProduct()
     }
 }
 
-searchProduct();
-die();
+# ======================================== search Sub Product ===================================================
+function searchSubProduct()
+{
+    echo "===================================== search Sub Product ===================================" .PHP_EOL;
+    global $ProductService;
+
+    $param =
+        [## ============================ *Required Parameters  =============================
+            "productGroupId"                => ['Put product group ids'],
+        ## ============================= Optional Parameters  ==============================
+#            "token"             => "{Put AccessToken}", # for this service we can use AccessToken
+#            "query"                   => "Put search query",
+#            'attributes'            => [
+#                [
+#                    'attributeCode'   => 'Put attribute code',
+#                    'attributeValue'  => 'Put attribute value',
+#                ],
+#             ],
+#          "orderByAttributeCode"           => "put asc | desc",
+#          "orderByDirection"          => "put asc | desc",
+#          "tags"                  => ["put tag1", ...],
+#          "tagTrees"              => ["put tag tree 1", ...],
+#          'scVoucherHash'     => ['Put Service Call Voucher Hashes'],
+#          'scApiKey'           => 'Put service call Api Key',
+    ];
+    try {
+        $result = $ProductService->searchSubProduct($param);
+        print_r($result);
+    }
+    catch (ValidationException $e) {
+        print_r($e->getResult());
+        print_r($e->getErrorsAsArray());
+    } catch (PodException $e) {
+        print_r($e->getResult());
+    }
+}

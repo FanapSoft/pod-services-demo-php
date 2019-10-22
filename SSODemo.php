@@ -18,10 +18,6 @@ use Pod\Sso\Service\SSOService;
 use Pod\Base\Service\BaseInfo;
 use Pod\Base\Service\ClientInfo;
 
-# set serverType to SandBox or Production
-# NOTICE : for SSOService there is no SandBox Server
-BaseInfo::initServerType(BaseInfo::PRODUCTION_SERVER);
-
 
 // for most service you need set client id and client secret so you can set these parameters once
 
